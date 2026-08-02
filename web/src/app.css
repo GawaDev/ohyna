@@ -1,0 +1,1769 @@
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+/*
+  body は常に overflow:hidden のためスクロールバーが無い。
+  Modal の RemoveScroll が padding-right を足すと右側に隙間ができて背後が崩れる。
+*/
+html body {
+  --removed-body-scroll-bar-size: 0px !important;
+  padding-right: 0 !important;
+  margin-right: 0 !important;
+}
+
+/*
+  Mantine Notifications（top-center）:
+  - 上部中央から下へにゅっと入場（Mantine Transition の translateY）
+  - root に背景があると帯に見えるので透明
+  - 詳細は下部の出力へ（トーストは短い案内）
+  - プレビュー iframe の白飛び対策は .ohyna-preview-stage 側の合成固定で吸収
+*/
+.ohyna-notifications {
+  pointer-events: none !important;
+  width: min(380px, calc(100vw - 2rem)) !important;
+  max-width: min(380px, calc(100vw - 2rem)) !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  overflow: visible !important;
+  top: 0.65rem !important;
+}
+.ohyna-notifications > * {
+  pointer-events: none !important;
+  width: 100% !important;
+  background: transparent !important;
+  background-color: transparent !important;
+}
+.ohyna-notifications .ohyna-notification {
+  pointer-events: auto !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  max-height: none !important;
+  will-change: transform, opacity;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1) !important;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.08),
+    0 8px 20px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* 文書設定: フォント選択カード */
+.ohyna-font-option {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  padding: 12px 14px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--mantine-color-gray-3);
+  background: #fff;
+  box-shadow: 0 1px 0 rgba(15, 23, 42, 0.04);
+  transition:
+    border-color 140ms ease,
+    background-color 140ms ease,
+    box-shadow 140ms ease,
+    transform 140ms ease;
+}
+.ohyna-font-option:hover {
+  border-color: var(--mantine-color-blue-3);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.07);
+  transform: translateY(-1px);
+}
+.ohyna-font-option--active {
+  border-color: var(--mantine-color-blue-6);
+  background: linear-gradient(
+    180deg,
+    var(--mantine-color-blue-0) 0%,
+    #fff 72%
+  );
+  box-shadow:
+    inset 0 0 0 1px var(--mantine-color-blue-6),
+    0 4px 14px rgba(25, 118, 210, 0.12);
+}
+.ohyna-font-option-check {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--mantine-color-blue-6);
+  color: #fff;
+  flex-shrink: 0;
+}
+.ohyna-font-option--active .ohyna-font-option-meta {
+  padding-right: 28px;
+}
+.ohyna-font-option-meta {
+  display: grid;
+  gap: 2px;
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--mantine-color-gray-6);
+}
+.ohyna-font-option-sample {
+  margin-top: 2px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--mantine-color-gray-0);
+  border: 1px solid var(--mantine-color-gray-2);
+  line-height: 1.35;
+}
+.ohyna-font-option--active .ohyna-font-option-sample {
+  background: #fff;
+  border-color: var(--mantine-color-blue-1);
+}
+.ohyna-font-option-sample-ja {
+  display: block;
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--mantine-color-dark-7);
+  letter-spacing: 0.04em;
+}
+.ohyna-font-option-sample-en {
+  display: block;
+  margin-top: 2px;
+  font-size: 15px;
+  color: var(--mantine-color-gray-7);
+}
+.ohyna-font-option-sample--code {
+  font-size: 14px;
+  letter-spacing: 0.01em;
+  color: var(--mantine-color-dark-6);
+  font-variant-ligatures: none;
+}
+.ohyna-font-option--mono .ohyna-font-option-sample {
+  background: #0f172a;
+  border-color: #1e293b;
+  color: #e2e8f0;
+}
+.ohyna-font-option--mono.ohyna-font-option--active .ohyna-font-option-sample {
+  background: #0f172a;
+  border-color: var(--mantine-color-blue-6);
+}
+
+/* スクリーンリーダー専用（視覚非表示・読み上げ用） */
+.ohyna-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* 問題一覧（IDE の Problems 行） */
+.ohyna-diag-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: default;
+}
+.ohyna-diag-item--jump {
+  cursor: pointer;
+}
+.ohyna-diag-item--jump:hover {
+  background: var(--mantine-color-gray-1);
+}
+.ohyna-diag-item--jump:focus-visible {
+  outline: 2px solid var(--mantine-color-blue-5);
+  outline-offset: 1px;
+}
+
+/* CodeMirror lint（明るいエディタ向け） */
+.ohyna-editor-wrap .cm-diagnostic-error {
+  border-bottom: 2px wavy #cf222e;
+}
+.ohyna-editor-wrap .cm-diagnostic-warning {
+  border-bottom: 2px wavy #bf8700;
+}
+.ohyna-editor-wrap .cm-diagnostic-info {
+  border-bottom: 2px wavy #0969da;
+}
+.ohyna-editor-wrap .cm-lintRange-error {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='3'%3E%3Cpath d='M0 2.5 Q1.5 0 3 2.5 Q4.5 5 6 2.5' fill='none' stroke='%23cf222e' stroke-width='1'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-position: bottom;
+  padding-bottom: 2px;
+}
+.ohyna-editor-wrap .cm-lintRange-warning {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='3'%3E%3Cpath d='M0 2.5 Q1.5 0 3 2.5 Q4.5 5 6 2.5' fill='none' stroke='%23bf8700' stroke-width='1'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-position: bottom;
+  padding-bottom: 2px;
+}
+.ohyna-editor-wrap .cm-gutter-lint .cm-lint-marker-error {
+  content: "";
+}
+
+/* 文書設定: タブ切替でモーダル高さが跳ねないように固定 */
+.ohyna-settings-modal-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+.ohyna-settings-modal-content--full {
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100% !important;
+  max-height: 100% !important;
+}
+.ohyna-settings-modal-content--full .ohyna-settings-modal-body {
+  height: 100%;
+}
+.ohyna-settings-tabs {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+.ohyna-settings-tabs .mantine-Tabs-list {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+.ohyna-settings-tabs .mantine-Tabs-tab {
+  flex-shrink: 0;
+}
+.ohyna-settings-tab-body {
+  height: min(58vh, 520px);
+  overflow: auto;
+  padding-right: 4px;
+  margin-top: 0;
+}
+.ohyna-settings-modal-content--full .ohyna-settings-tab-body {
+  height: auto;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.ohyna-settings-actions {
+  flex-shrink: 0;
+  padding-top: 4px;
+  border-top: 1px solid var(--mantine-color-gray-2);
+}
+
+/* 色テーマ・表紙デザインの見本 */
+.ohyna-color-swatch {
+  display: inline-block;
+  border-radius: 6px;
+  border: 1px solid rgba(15, 23, 42, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
+  flex-shrink: 0;
+}
+.ohyna-cover-thumb {
+  width: 22px;
+  height: 28px;
+  object-fit: cover;
+  border-radius: 3px;
+  border: 1px solid rgba(15, 23, 42, 0.16);
+  background: var(--mantine-color-gray-2);
+  flex-shrink: 0;
+}
+.ohyna-cover-thumb--lg {
+  width: 28px;
+  height: 36px;
+}
+.ohyna-cover-caption {
+  display: grid;
+  gap: 2px;
+  color: var(--mantine-color-gray-7);
+}
+
+/* 文書設定: 表紙プレビュー */
+.ohyna-cover-preview-wrap {
+  position: sticky;
+  top: 0;
+}
+.ohyna-cover-preview {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  max-width: 280px;
+  margin-inline: auto;
+  aspect-ratio: var(--ohyna-cover-aspect, 210 / 297);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.08),
+    0 12px 28px rgba(15, 23, 42, 0.18);
+  background: var(--ohyna-cover-bg, #1976d2);
+  color: var(--ohyna-cover-fg, #fff);
+  display: flex;
+  flex-direction: column;
+}
+.ohyna-cover-preview--off {
+  min-height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--mantine-color-gray-4);
+  box-shadow: none;
+  background: var(--mantine-color-gray-0);
+  color: inherit;
+  aspect-ratio: auto;
+}
+.ohyna-cover-preview-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+.ohyna-cover-preview-bg--solid {
+  display: block;
+}
+.ohyna-cover-preview-body {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 14% 10%;
+  box-sizing: border-box;
+  min-height: 0;
+}
+.ohyna-cover-slot {
+  position: relative;
+  margin-bottom: 0.55em;
+}
+.ohyna-cover-slot--empty {
+  opacity: 0.9;
+}
+.ohyna-cover-slot--meta {
+  margin-top: auto;
+  margin-bottom: 0;
+  padding-top: 0.75em;
+  border-top: 1px solid rgba(255, 255, 255, 0.35);
+}
+.ohyna-cover-slot-tag {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  padding: 2px 5px;
+  margin-bottom: 4px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+}
+.ohyna-cover-part-label {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 3px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.12);
+}
+.ohyna-cover-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: inherit;
+}
+.ohyna-cover-subtitle {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.5;
+  opacity: 0.95;
+}
+.ohyna-cover-meta {
+  font-size: 10px;
+  line-height: 1.45;
+  opacity: 0.95;
+}
+.ohyna-cover-meta div + div {
+  margin-top: 2px;
+}
+
+
+.ohyna-app,
+.ohyna-app.mantine-AppShell-root {
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+
+/* static グリッド: ヘッダ / メイン(1fr) / フッタ */
+.ohyna-app.mantine-AppShell-root[data-mode="static"] {
+  overflow: hidden;
+}
+
+/* 未保存: ヘッダ下端のアクセント（エラーの赤ではなく注意の琥珀） */
+.ohyna-app--dirty .mantine-AppShell-header {
+  border-bottom-color: rgba(217, 119, 6, 0.45);
+  box-shadow: inset 0 -2px 0 0 rgba(217, 119, 6, 0.55);
+}
+
+.ohyna-app-header {
+  min-height: 0;
+}
+
+.ohyna-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.ohyna-brand:hover {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ohyna-brand-mark {
+  display: block;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+.ohyna-brand-title {
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+
+.ohyna-header-view {
+  flex-shrink: 0;
+}
+
+.ohyna-doc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  max-width: min(28vw, 280px);
+  min-width: 0;
+  padding: 1px 8px 1px 6px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease;
+}
+
+@media (max-width: 720px) {
+  .ohyna-brand-title {
+    display: none;
+  }
+  .ohyna-doc-chip {
+    max-width: min(46vw, 220px);
+  }
+  .ohyna-header-actions .mantine-Button-section {
+    margin-inline-end: 4px;
+  }
+}
+
+/* タブレット: 編集／プレビューを縦並び */
+@media (max-width: 768px) {
+  .ohyna-workspace--narrow .mantine-Splitter-pane {
+    min-height: 140px !important;
+  }
+  .ohyna-workspace--narrow .mantine-Splitter-handle {
+    min-height: 12px;
+    touch-action: none;
+  }
+  .ohyna-pdf-modal-content {
+    max-height: 100dvh !important;
+    height: 100dvh !important;
+  }
+}
+
+/* スマホ: 編集／プレビューを切替表示 */
+@media (max-width: 560px) {
+  .ohyna-workspace--mobile-pane-edit > .mantine-Splitter-handle,
+  .ohyna-workspace--mobile-pane-edit > .mantine-Splitter-pane:last-child,
+  .ohyna-workspace--mobile-pane-preview > .mantine-Splitter-handle,
+  .ohyna-workspace--mobile-pane-preview > .mantine-Splitter-pane:first-child {
+    display: none !important;
+  }
+
+  .ohyna-workspace--mobile-pane-edit > .mantine-Splitter-pane:first-child,
+  .ohyna-workspace--mobile-pane-preview > .mantine-Splitter-pane:last-child {
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: 100% !important;
+    min-height: 0 !important;
+  }
+
+  .ohyna-app .mantine-AppShell-header {
+    padding-inline: 8px !important;
+  }
+
+  .ohyna-doc-chip {
+    max-width: min(38vw, 160px);
+  }
+
+  .ohyna-pane-head {
+    padding-inline: 8px !important;
+  }
+}
+
+.ohyna-doc-chip--dirty {
+  border-color: rgba(217, 119, 6, 0.35);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 247, 237, 0.95) 0%,
+    rgba(255, 237, 213, 0.85) 100%
+  );
+  color: #9a3412;
+}
+
+.ohyna-doc-chip__name {
+  min-width: 0;
+  font-weight: 500;
+}
+
+.ohyna-doc-chip--dirty .ohyna-doc-chip__name {
+  color: #9a3412;
+  font-weight: 600;
+}
+
+.ohyna-dirty-dot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ea580c;
+  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.18);
+  animation: ohyna-dirty-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes ohyna-dirty-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.16);
+  }
+  50% {
+    box-shadow: 0 0 0 5px rgba(234, 88, 12, 0.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ohyna-dirty-dot {
+    animation: none;
+  }
+}
+
+/*
+  AppShell mode=static の中央行（1fr）を埋める。
+  min-height:0 はグリッド子の縮小に必要。height:100% で行高を継承する。
+  （fixed モードで min-height:0 にすると 100dvh が潰れエディタ高さが 0 になる）
+*/
+.ohyna-app .mantine-AppShell-main {
+  min-height: 0 !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  box-sizing: border-box !important;
+}
+
+.ohyna-shell-split.mantine-Splitter-root,
+.ohyna-shell-split {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  align-items: stretch !important;
+}
+
+.ohyna-shell-split .mantine-Splitter-pane {
+  min-width: 0;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.ohyna-shell-split--resizing .ohyna-preview-stage iframe,
+.ohyna-shell-split--resizing .ohyna-editor-wrap,
+.ohyna-shell-split--resizing .cm-editor {
+  pointer-events: none !important;
+}
+
+.ohyna-shell-split--resizing .mantine-Splitter-handle {
+  touch-action: none;
+}
+
+.ohyna-workspace.mantine-Splitter-root,
+.ohyna-workspace {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  align-items: stretch !important;
+}
+
+/* 左右ペインを同じ高さに縛り、中でスクロールさせる */
+.ohyna-workspace .mantine-Splitter-pane {
+  min-width: 0;
+  min-height: 0 !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  align-self: stretch !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* ドラッグ中は iframe / エディタがポインタを奪わないようにする */
+.ohyna-workspace--resizing .ohyna-preview-stage iframe,
+.ohyna-workspace--resizing .ohyna-editor-wrap,
+.ohyna-workspace--resizing .cm-editor {
+  pointer-events: none !important;
+}
+
+.ohyna-workspace--resizing .mantine-Splitter-handle {
+  touch-action: none;
+}
+
+/* 編集／プレビューのホスト（スマホ切替バー付き） */
+.ohyna-workspace-host {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.ohyna-workspace-host > .ohyna-workspace {
+  flex: 1 1 auto;
+}
+
+.ohyna-mobile-pane-switch {
+  flex: 0 0 auto;
+  border-radius: 0 !important;
+  border-bottom: 1px solid var(--mantine-color-gray-3);
+}
+
+.ohyna-pane {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ohyna-popout .ohyna-pane {
+  height: 100%;
+}
+
+.ohyna-popout .ohyna-preview-stage {
+  flex: 1 1 auto;
+}
+
+.ohyna-console-popout .mantine-AppShell-main {
+  padding: 0 !important;
+}
+
+.ohyna-console-popout .ohyna-msg-console {
+  border-top: none;
+}
+
+.ohyna-pane-head {
+  flex: 0 0 36px;
+  height: 36px;
+  min-height: 36px;
+  max-height: 36px;
+  align-items: center !important;
+  box-sizing: border-box;
+  border-bottom: 1px solid var(--mantine-color-gray-3);
+  background: var(--mantine-color-gray-0);
+  overflow: hidden;
+}
+
+.ohyna-editor-toolbar {
+  flex: 0 0 auto;
+  min-height: 34px;
+  align-items: center !important;
+  border-bottom: 1px solid var(--mantine-color-gray-2);
+  background: #f6f8fa;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.ohyna-editor-toolbar > * {
+  flex-shrink: 0;
+}
+
+.ohyna-editor-insert-btn {
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* ツールバー／ヘッダ操作のキーボードフォーカス */
+.ohyna-editor-toolbar .mantine-ActionIcon-root:focus-visible,
+.ohyna-editor-toolbar .ohyna-editor-insert-btn:focus-visible,
+.ohyna-app .mantine-AppShell-header .mantine-ActionIcon-root:focus-visible,
+.ohyna-pane-head .mantine-ActionIcon-root:focus-visible,
+.ohyna-pane-head .mantine-Button-root:focus-visible {
+  outline: 2px solid var(--mantine-color-blue-5);
+  outline-offset: 2px;
+}
+
+.ohyna-editor-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  background: #fbfcfd;
+  position: relative;
+}
+
+/* @uiw/react-codemirror の外側ラッパーを親高さに固定 */
+.ohyna-editor-wrap > .cm-theme-none,
+.ohyna-editor-wrap > div {
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/*
+  CM は position:relative !important。
+  absolute で上書きし、中の .cm-scroller だけが伸びてスクロールする。
+*/
+.ohyna-editor-wrap .cm-editor {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+}
+
+.ohyna-editor-wrap .cm-scroller {
+  overflow-x: auto !important;
+  overflow-y: auto !important;
+  height: 100% !important;
+  max-height: 100% !important;
+}
+
+.ohyna-editor-wrap .cm-focused {
+  outline: none;
+}
+
+.ohyna-pdf-modal-content {
+  display: flex !important;
+  flex-direction: column !important;
+  max-height: 92dvh !important;
+  height: 92dvh !important;
+  overflow: hidden !important;
+}
+
+.ohyna-pdf-modal-header {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--mantine-color-gray-3);
+}
+
+.ohyna-pdf-modal-body {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.ohyna-pdf-modal-toolbar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--mantine-color-gray-3);
+  background: var(--mantine-color-gray-0);
+}
+
+.ohyna-pdf-modal-stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  background: #cfd6de;
+}
+
+.ohyna-preview-stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--ohyna-host-desk, #cfd6de);
+  /* 通知アニメ等で iframe が白く飛ぶのを抑える */
+  isolation: isolate;
+  transform: translateZ(0);
+}
+
+.ohyna-pdf-root {
+  position: absolute;
+  inset: 0;
+  overscroll-behavior: contain;
+  touch-action: pan-x pan-y;
+  background: var(--ohyna-host-desk, #cfd6de);
+}
+
+.ohyna-pdf-toolbar {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 6;
+  background: rgba(255, 255, 255, 0.94) !important;
+}
+
+.ohyna-pdf-toolbar .mantine-Text-root {
+  cursor: pointer;
+}
+
+.ohyna-pdf-scroll {
+  position: absolute;
+  inset: 0;
+  overflow-x: auto;
+  overflow-y: scroll;
+  padding: 12px 44px 12px;
+  box-sizing: border-box;
+  /* スクロールバー出現による幅収縮→縮小のフィードバックループを防止 */
+  scrollbar-gutter: stable;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: grab;
+}
+
+.ohyna-pdf-scroll.ohyna-panning {
+  cursor: grabbing !important;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* transform:scale 用。拡大後の占有サイズを先に確保する */
+.ohyna-pdf-scaler-slot {
+  position: relative;
+  flex: 0 0 auto;
+  overflow: hidden;
+}
+
+.ohyna-pdf-scaler {
+  position: relative;
+}
+
+.ohyna-pdf-document {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 12px;
+  padding-bottom: 24px;
+}
+
+.ohyna-pdf-page-wrap {
+  display: block;
+  flex: 0 0 auto;
+  /* 仮想化時の未描画プレースホルダでも用紙サイズを維持 */
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.12);
+  overflow: hidden;
+}
+
+.ohyna-pdf-page {
+  display: block !important;
+  margin: 0;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.18);
+}
+
+/* PDF 確認: 注釈リンクもジャンプさせない（見た目のみ） */
+.ohyna-pdf-page .annotationLayer section,
+.ohyna-pdf-page .annotationLayer a {
+  pointer-events: none !important;
+  cursor: default !important;
+}
+
+.ohyna-pdf-nav {
+  position: absolute;
+  top: 50%;
+  z-index: 5;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #334155;
+  cursor: pointer;
+  padding: 0;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
+}
+
+.ohyna-pdf-nav:hover:not(:disabled) {
+  background: #fff;
+  color: #0f172a;
+}
+
+.ohyna-pdf-nav:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.ohyna-pdf-nav-prev {
+  left: 8px;
+}
+
+.ohyna-pdf-nav-next {
+  right: 8px;
+}
+
+/* CSS で canvas を伸縮しない（Page width で再描画する） */
+.ohyna-pdf-page canvas {
+  display: block;
+}
+
+.ohyna-html-stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--ohyna-host-desk, #cfd6de);
+}
+
+.ohyna-html-frame-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: var(--ohyna-host-desk, #cfd6de);
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  color-scheme: only light;
+}
+
+.ohyna-html-loading {
+  position: absolute;
+  inset: 0;
+  background: rgba(207, 214, 222, 0.72);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* 旧スケール枠（PDF 確認側とクラス共有しない） */
+.ohyna-html-scale {
+  position: relative;
+  margin: 0 auto;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.18);
+}
+
+.ohyna-html-frame {
+  display: block;
+  border: 0;
+  background: transparent;
+  transform-origin: top left;
+  pointer-events: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* ヘルプモーダル */
+.ohyna-help-modal-content {
+  --ohyna-help-nav-w: minmax(200px, 260px);
+  --ohyna-help-ink: var(--mantine-color-dark-7);
+  --ohyna-help-muted: var(--mantine-color-gray-6);
+  --ohyna-help-line: color-mix(in srgb, var(--mantine-color-gray-3) 88%, transparent);
+  --ohyna-help-nav-bg: var(--mantine-color-gray-0);
+  --ohyna-help-paper: var(--mantine-color-body);
+  --ohyna-help-code-bg: var(--mantine-color-gray-1);
+  --ohyna-help-pre-bg: #f4f6f8;
+  --ohyna-help-accent: var(--mantine-color-blue-6);
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100dvh !important;
+  max-height: 100dvh !important;
+  overflow: hidden !important;
+  border: 0;
+  box-shadow: none !important;
+}
+.ohyna-help-modal-header {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--ohyna-help-line);
+  background: var(--mantine-color-body);
+}
+.ohyna-help-modal-title {
+  flex: 1 1 auto;
+}
+.ohyna-help-modal-body {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+.ohyna-help-layout {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: var(--ohyna-help-nav-w) 1fr;
+  height: 100%;
+}
+.ohyna-help-nav {
+  border-right: 1px solid var(--ohyna-help-line);
+  background: var(--ohyna-help-nav-bg);
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.ohyna-help-nav-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+}
+.ohyna-help-nav-group-label {
+  letter-spacing: 0.04em;
+  color: var(--ohyna-help-muted);
+  text-transform: none;
+}
+.ohyna-help-nav-group-icon {
+  color: var(--ohyna-help-muted);
+  flex-shrink: 0;
+}
+.ohyna-help-nav-link-root {
+  border-radius: 8px !important;
+  padding-inline: 10px !important;
+  transition:
+    background-color 140ms ease,
+    color 140ms ease,
+    box-shadow 140ms ease;
+}
+.ohyna-help-nav-link-root:hover {
+  background: color-mix(in srgb, var(--mantine-color-blue-0) 80%, transparent) !important;
+}
+.ohyna-help-nav-link-root[data-active] {
+  background: color-mix(in srgb, var(--mantine-color-blue-1) 90%, #fff) !important;
+  color: var(--mantine-color-blue-8) !important;
+  box-shadow: inset 3px 0 0 var(--ohyna-help-accent);
+  font-weight: 600;
+}
+.ohyna-help-nav-link-label {
+  font-size: 13px !important;
+  line-height: 1.35 !important;
+}
+.ohyna-help-main {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--ohyna-help-paper);
+}
+.ohyna-help-main-head {
+  flex: 0 0 auto;
+  border-bottom: 1px solid var(--ohyna-help-line);
+  background: var(--mantine-color-body);
+}
+.ohyna-help-main-title {
+  color: var(--ohyna-help-ink);
+}
+.ohyna-help-article {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+.ohyna-help-article-inner {
+  min-height: 100%;
+}
+.ohyna-help-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+  color: var(--ohyna-help-muted);
+  opacity: 0.85;
+}
+.ohyna-help-footer {
+  flex: 0 0 auto;
+  border-top: 1px solid var(--ohyna-help-line);
+  background: var(--mantine-color-body);
+}
+.ohyna-help-markdown {
+  font-size: 14.5px;
+  line-height: 1.75;
+  color: var(--ohyna-help-ink);
+  max-width: 48rem;
+  margin: 0 auto;
+  letter-spacing: 0.01em;
+}
+.ohyna-help-markdown > :first-child {
+  margin-top: 0;
+}
+.ohyna-help-markdown h1,
+.ohyna-help-markdown h2,
+.ohyna-help-markdown h3,
+.ohyna-help-markdown h4 {
+  line-height: 1.35;
+  margin: 1.55em 0 0.55em;
+  font-weight: 700;
+  color: var(--ohyna-help-ink);
+  scroll-margin-top: 12px;
+}
+.ohyna-help-markdown h1 {
+  font-size: 1.55rem;
+  margin-top: 0;
+  letter-spacing: -0.01em;
+}
+.ohyna-help-markdown h2 {
+  font-size: 1.22rem;
+  padding-bottom: 0.35em;
+  border-bottom: 1px solid var(--ohyna-help-line);
+}
+.ohyna-help-markdown h3 {
+  font-size: 1.06rem;
+}
+.ohyna-help-markdown h4 {
+  font-size: 0.98rem;
+  color: var(--mantine-color-dark-5);
+}
+.ohyna-help-markdown p,
+.ohyna-help-markdown ul,
+.ohyna-help-markdown ol,
+.ohyna-help-markdown table,
+.ohyna-help-markdown pre,
+.ohyna-help-markdown blockquote {
+  margin: 0.8em 0;
+}
+.ohyna-help-markdown ul,
+.ohyna-help-markdown ol {
+  padding-left: 1.35em;
+}
+.ohyna-help-markdown li + li {
+  margin-top: 0.28em;
+}
+.ohyna-help-markdown li::marker {
+  color: var(--mantine-color-gray-5);
+}
+.ohyna-help-markdown hr {
+  border: 0;
+  border-top: 1px solid var(--ohyna-help-line);
+  margin: 1.6em 0;
+}
+.ohyna-help-markdown strong {
+  font-weight: 700;
+  color: color-mix(in srgb, var(--ohyna-help-ink) 92%, var(--ohyna-help-accent));
+}
+.ohyna-help-markdown code {
+  font-family: "IBM Plex Mono", Consolas, monospace;
+  font-size: 0.88em;
+  background: var(--ohyna-help-code-bg);
+  padding: 0.12em 0.4em;
+  border-radius: 5px;
+  border: 1px solid color-mix(in srgb, var(--mantine-color-gray-3) 70%, transparent);
+}
+.ohyna-help-markdown pre {
+  background: var(--ohyna-help-pre-bg);
+  border: 1px solid var(--ohyna-help-line);
+  border-radius: 10px;
+  padding: 12px 14px;
+  overflow-x: auto;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+.ohyna-help-markdown pre code {
+  background: transparent;
+  padding: 0;
+  border: 0;
+  font-size: 0.86em;
+  line-height: 1.55;
+}
+.ohyna-help-markdown table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.92em;
+  overflow: hidden;
+  border: 1px solid var(--ohyna-help-line);
+  border-radius: 10px;
+  background: #fff;
+}
+.ohyna-help-markdown th,
+.ohyna-help-markdown td {
+  border-bottom: 1px solid var(--ohyna-help-line);
+  border-right: 1px solid var(--ohyna-help-line);
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+.ohyna-help-markdown th:last-child,
+.ohyna-help-markdown td:last-child {
+  border-right: 0;
+}
+.ohyna-help-markdown tr:last-child td {
+  border-bottom: 0;
+}
+.ohyna-help-markdown th {
+  background: color-mix(in srgb, var(--mantine-color-gray-0) 88%, var(--mantine-color-blue-0));
+  font-weight: 700;
+  font-size: 0.95em;
+}
+.ohyna-help-markdown tbody tr:nth-child(even) td {
+  background: color-mix(in srgb, var(--mantine-color-gray-0) 55%, transparent);
+}
+.ohyna-help-markdown blockquote {
+  margin-left: 0;
+  padding: 10px 14px;
+  border-left: 3px solid var(--mantine-color-blue-4);
+  color: var(--mantine-color-gray-7);
+  background: color-mix(in srgb, var(--mantine-color-blue-0) 75%, #fff);
+  border-radius: 0 8px 8px 0;
+}
+.ohyna-help-markdown blockquote p {
+  margin: 0.35em 0;
+}
+.ohyna-help-markdown a {
+  color: var(--mantine-color-blue-7);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--mantine-color-blue-4) 55%, transparent);
+  text-underline-offset: 2px;
+  transition: color 120ms ease, text-decoration-color 120ms ease;
+}
+.ohyna-help-markdown a:hover {
+  color: var(--mantine-color-blue-8);
+  text-decoration-color: var(--mantine-color-blue-6);
+}
+@media (max-width: 720px) {
+  .ohyna-help-modal-content {
+    --ohyna-help-nav-w: 1fr;
+  }
+  .ohyna-help-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+  .ohyna-help-nav {
+    border-right: none;
+    border-bottom: 1px solid var(--ohyna-help-line);
+    max-height: min(32dvh, 220px);
+  }
+  .ohyna-help-nav-scroll {
+    max-height: inherit;
+  }
+  .ohyna-help-article-inner {
+    padding: 16px !important;
+  }
+  .ohyna-help-footer {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 560px) {
+  .ohyna-help-nav {
+    max-height: min(26dvh, 168px);
+  }
+  .ohyna-help-article-inner {
+    padding: 12px !important;
+  }
+  .ohyna-help-main-head {
+    padding-inline: 12px !important;
+  }
+}
+
+/* IDE 風メッセージコンソール（AppShell footer） */
+.ohyna-app .mantine-AppShell-footer {
+  padding: 0 !important;
+  border-top: 1px solid var(--mantine-color-gray-3);
+  background: #f6f8fa;
+  z-index: 50;
+  overflow: hidden;
+}
+
+.ohyna-msg-console {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  background: #f6f8fa;
+  overflow: hidden;
+}
+
+.ohyna-msg-console__bar {
+  flex-shrink: 0;
+  align-items: center !important;
+  border-bottom: 1px solid transparent;
+  overflow: hidden;
+}
+
+.ohyna-msg-console--open .ohyna-msg-console__bar {
+  border-bottom-color: var(--mantine-color-gray-3);
+  background: #eef1f4;
+}
+
+.ohyna-msg-console__toggle {
+  display: flex;
+  align-items: center;
+  text-align: left;
+  color: inherit;
+  height: 100%;
+  min-height: 0;
+  flex: 0 0 auto;
+}
+
+.ohyna-msg-console__toggle:hover {
+  color: var(--mantine-color-blue-7);
+}
+
+.ohyna-msg-console__toggle:focus-visible {
+  outline: 2px solid var(--mantine-color-blue-5);
+  outline-offset: -2px;
+  border-radius: 4px;
+}
+
+.ohyna-msg-console__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  line-height: 1;
+  color: var(--mantine-color-dark-6);
+  flex-shrink: 0;
+}
+
+button.ohyna-msg-console__status {
+  cursor: pointer;
+}
+
+button.ohyna-msg-console__status:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.ohyna-msg-console__status--active {
+  background: rgba(34, 139, 230, 0.12);
+}
+
+.ohyna-msg-console__status-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+}
+
+.ohyna-msg-console__status--ok .ohyna-msg-console__status-icon {
+  color: var(--mantine-color-teal-6);
+}
+
+.ohyna-msg-console__status--error .ohyna-msg-console__status-icon {
+  color: var(--mantine-color-red-6);
+}
+
+.ohyna-msg-console__status--warn .ohyna-msg-console__status-icon {
+  color: var(--mantine-color-orange-6);
+}
+
+.ohyna-msg-console__status--pending .ohyna-msg-console__status-icon,
+.ohyna-msg-console__status--idle .ohyna-msg-console__status-icon {
+  color: var(--mantine-color-gray-6);
+}
+
+.ohyna-msg-console__status:focus-visible {
+  outline: 2px solid var(--mantine-color-blue-5);
+  outline-offset: 1px;
+}
+
+.ohyna-msg-console__latest {
+  min-width: 0;
+  flex: 1;
+  text-align: left;
+}
+
+.ohyna-msg-console__latest:hover {
+  color: var(--mantine-color-blue-7);
+}
+
+.ohyna-msg-console__panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.ohyna-msg-console__tabs {
+  flex-shrink: 0;
+  height: 28px;
+  align-items: center;
+  border-bottom: 1px solid var(--mantine-color-gray-3);
+  background: #eef1f4;
+}
+
+.ohyna-msg-console__tab {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--mantine-color-dimmed);
+  padding: 4px 10px;
+  border-radius: 4px 4px 0 0;
+}
+
+.ohyna-msg-console__tab:hover {
+  color: var(--mantine-color-dark-6);
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.ohyna-msg-console__tab--active {
+  color: var(--mantine-color-dark-7);
+  background: #f6f8fa;
+  box-shadow: inset 0 -2px 0 var(--mantine-color-blue-5);
+}
+
+.ohyna-msg-console__body {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.ohyna-msg-row {
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--mantine-color-gray-2);
+}
+
+.ohyna-msg-row--error {
+  background: rgba(255, 245, 245, 0.85);
+}
+
+.ohyna-msg-row--warning {
+  background: rgba(255, 249, 240, 0.9);
+}
+
+.ohyna-msg-row__icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.ohyna-msg-row__detail {
+  margin: 4px 0 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: "IBM Plex Mono", "Cascadia Code", Consolas, monospace;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+/*
+  暗い表示（UI のみ）。
+  紙面（PDF ページ／HTML スケール枠／iframe 本文）は常に白のまま。
+*/
+[data-mantine-color-scheme="dark"] .ohyna-font-option {
+  background: var(--mantine-color-dark-6);
+  border-color: var(--mantine-color-dark-4);
+  box-shadow: none;
+}
+[data-mantine-color-scheme="dark"] .ohyna-font-option:hover {
+  border-color: var(--mantine-color-blue-5);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+[data-mantine-color-scheme="dark"] .ohyna-font-option--active {
+  background: linear-gradient(
+    180deg,
+    rgba(34, 139, 230, 0.18) 0%,
+    var(--mantine-color-dark-6) 72%
+  );
+  border-color: var(--mantine-color-blue-5);
+  box-shadow: inset 0 0 0 1px var(--mantine-color-blue-5);
+}
+[data-mantine-color-scheme="dark"] .ohyna-font-option-sample {
+  background: var(--mantine-color-dark-7);
+  border-color: var(--mantine-color-dark-4);
+}
+[data-mantine-color-scheme="dark"] .ohyna-font-option--active .ohyna-font-option-sample {
+  background: var(--mantine-color-dark-7);
+  border-color: var(--mantine-color-blue-8);
+}
+[data-mantine-color-scheme="dark"] .ohyna-font-option-sample-ja {
+  color: var(--mantine-color-gray-0);
+}
+[data-mantine-color-scheme="dark"] .ohyna-diag-item--jump:hover {
+  background: var(--mantine-color-dark-5);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-doc-chip--dirty {
+  border-color: rgba(251, 191, 36, 0.4);
+  background: linear-gradient(
+    180deg,
+    rgba(120, 53, 15, 0.55) 0%,
+    rgba(154, 52, 18, 0.4) 100%
+  );
+  color: #fdba74;
+}
+[data-mantine-color-scheme="dark"] .ohyna-doc-chip--dirty .ohyna-doc-chip__name {
+  color: #fdba74;
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-pane-head {
+  border-bottom-color: var(--mantine-color-dark-4);
+  background: var(--mantine-color-dark-7);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-editor-toolbar {
+  background: var(--mantine-color-dark-7);
+  border-bottom-color: var(--mantine-color-dark-4);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-preview-loading-chip {
+  background: var(--mantine-color-dark-6);
+  border-color: var(--mantine-color-dark-4);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-pdf-modal-header {
+  border-bottom-color: var(--mantine-color-dark-4);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-editor-wrap {
+  background: #0d1117;
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-pdf-modal-toolbar {
+  background: var(--mantine-color-dark-7);
+  border-bottom-color: var(--mantine-color-dark-4);
+}
+
+/* 机（台）だけ暗くする。紙は白固定 */
+:root {
+  --ohyna-host-desk: #cfd6de;
+}
+[data-mantine-color-scheme="dark"] {
+  --ohyna-host-desk: #2a3038;
+}
+[data-mantine-color-scheme="dark"] .ohyna-preview-stage,
+[data-mantine-color-scheme="dark"] .ohyna-html-stage,
+[data-mantine-color-scheme="dark"] .ohyna-pdf-modal-stage,
+[data-mantine-color-scheme="dark"] .ohyna-html-frame-fill,
+[data-mantine-color-scheme="dark"] .ohyna-pdf-root {
+  background: var(--ohyna-host-desk);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-html-loading {
+  background: rgba(42, 48, 56, 0.72);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-pdf-page-wrap,
+[data-mantine-color-scheme="dark"] .ohyna-html-scale {
+  background: #fff;
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-pdf-toolbar {
+  background: rgba(28, 33, 40, 0.94) !important;
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-pdf-nav {
+  background: rgba(28, 33, 40, 0.92);
+  color: #e2e8f0;
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-pdf-nav:hover:not(:disabled) {
+  background: #1c2128;
+  color: #f8fafc;
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-help-modal-content {
+  --ohyna-help-ink: var(--mantine-color-gray-1);
+  --ohyna-help-muted: var(--mantine-color-dark-2);
+  --ohyna-help-line: var(--mantine-color-dark-4);
+  --ohyna-help-nav-bg: var(--mantine-color-dark-7);
+  --ohyna-help-paper: var(--mantine-color-dark-7);
+  --ohyna-help-code-bg: var(--mantine-color-dark-5);
+  --ohyna-help-pre-bg: #0d1117;
+  --ohyna-help-accent: var(--mantine-color-blue-4);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-help-modal-header {
+  background: var(--mantine-color-dark-7);
+  border-bottom-color: var(--mantine-color-dark-4);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-help-nav {
+  border-right-color: var(--mantine-color-dark-4);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-help-nav-link-root:hover {
+  background: rgba(34, 139, 230, 0.1) !important;
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-help-nav-link-root[data-active] {
+  background: rgba(34, 139, 230, 0.18) !important;
+  color: var(--mantine-color-blue-2) !important;
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-help-main-head {
+  background: var(--mantine-color-dark-7);
+  border-bottom-color: var(--mantine-color-dark-4);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-help-footer {
+  background: var(--mantine-color-dark-7);
+  border-top-color: var(--mantine-color-dark-4);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-help-markdown h4 {
+  color: var(--mantine-color-gray-4);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-help-markdown code {
+  border-color: var(--mantine-color-dark-4);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-help-markdown pre {
+  box-shadow: none;
+  border-color: var(--mantine-color-dark-4);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-help-markdown table {
+  background: var(--mantine-color-dark-6);
+  border-color: var(--mantine-color-dark-4);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-help-markdown th {
+  background: var(--mantine-color-dark-5);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-help-markdown tbody tr:nth-child(even) td {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-help-markdown th,
+[data-mantine-color-scheme="dark"] .ohyna-help-markdown td {
+  border-color: var(--mantine-color-dark-4);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-help-markdown blockquote {
+  color: var(--mantine-color-gray-3);
+  background: rgba(34, 139, 230, 0.12);
+  border-left-color: var(--mantine-color-blue-5);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-help-markdown a {
+  color: var(--mantine-color-blue-4);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-help-markdown a:hover {
+  color: var(--mantine-color-blue-3);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-app .mantine-AppShell-footer {
+  background: var(--mantine-color-dark-7);
+  border-top-color: var(--mantine-color-dark-4);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-msg-console {
+  background: var(--mantine-color-dark-7);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-msg-console--open .ohyna-msg-console__bar {
+  background: var(--mantine-color-dark-6);
+  border-bottom-color: var(--mantine-color-dark-4);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-msg-console__tabs {
+  background: var(--mantine-color-dark-6);
+  border-bottom-color: var(--mantine-color-dark-4);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-msg-console__tab:hover {
+  color: var(--mantine-color-gray-1);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-msg-console__tab--active {
+  color: var(--mantine-color-gray-0);
+  background: var(--mantine-color-dark-7);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-msg-console__toggle:hover {
+  color: var(--mantine-color-blue-4);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-msg-console__status {
+  color: var(--mantine-color-gray-2);
+}
+
+[data-mantine-color-scheme="dark"] button.ohyna-msg-console__status:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-msg-console__status--active {
+  background: rgba(34, 139, 230, 0.22);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-msg-console__status--ok .ohyna-msg-console__status-icon {
+  color: var(--mantine-color-teal-4);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-msg-console__status--error .ohyna-msg-console__status-icon {
+  color: var(--mantine-color-red-4);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-msg-console__status--warn .ohyna-msg-console__status-icon {
+  color: var(--mantine-color-orange-4);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-msg-row {
+  border-bottom-color: var(--mantine-color-dark-4);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-msg-row--error {
+  background: rgba(248, 81, 73, 0.12);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-msg-row--warning {
+  background: rgba(210, 153, 34, 0.12);
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-notifications .ohyna-notification {
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.35),
+    0 6px 16px rgba(0, 0, 0, 0.28) !important;
+}

@@ -1,0 +1,18 @@
+Noto Emoji — U+1F423 Hatching Chick (🐣)
+
+Source: https://github.com/googlefonts/noto-emoji
+File:   svg/emoji_u1f423.svg
+
+Copyright 2013 Google LLC
+
+Per the Noto Emoji project README:
+- Emoji fonts are under the SIL Open Font License, Version 1.1
+- Tools and most image resources (including SVG glyphs used here) are under
+  the Apache License, Version 2.0
+
+Apache License 2.0 text: APACHE-2.0.txt (this directory)
+OFL text (font software): NOTO-EMOJI-OFL.txt (this directory)
+
+Ohyna places the unmodified glyph on a white rounded square (no border)
+for app-icon / favicon / PWA use. The chick artwork itself is the upstream
+Noto asset.

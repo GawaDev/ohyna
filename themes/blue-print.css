@@ -1,0 +1,1122 @@
+:root {
+  /* 既定は青。load_print_css() が文書テーマに応じて上書きする */
+  --accent-900: #0a5aa0;
+  --accent-800: #0b6bcb;
+  --accent-700: #1580d6;
+  --accent-600: #1e90e0;
+  --accent-100: #b7dff7;
+  --accent-50: #e5f4fb;
+  --accent-25: #f2f8fc;
+  --text: #0a5aa0;
+  --body: #263238;
+  --muted: #546e7a;
+  --border: #8ec8ec;
+  --page-bg: #ffffff;
+  --white: #ffffff;
+  --cover-1: #0b5cab;
+  --cover-2: #1565c0;
+  --cover-3: #1e88e5;
+  --cover-fg: #ffffff;
+  --code-bg: #0f2744;
+  --code-fg: #e8f1fa;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --font-sans: "Noto Sans JP", "Segoe UI", sans-serif;
+  --font-mono: "Cascadia Mono", Consolas, "Courier New", monospace;
+  --base-font-size: 10.5pt;
+  --line-height: 1.7;
+  --letter-spacing: 0;
+  --h2-bg: var(--accent-50);
+  --h2-padding: 8px 14px;
+  --h2-border-left: 5px solid var(--accent-700);
+  --h2-radius: 0 var(--radius-md) var(--radius-md) 0;
+  --th-bg: var(--accent-800);
+  --th-fg: var(--cover-fg);
+  --th-border: var(--accent-900);
+  --page-width: 210mm;
+  --page-height: 297mm;
+  --page-width-px: 794px;
+  --page-height-px: 1123px;
+  --page-margin-top: 14mm;
+  --page-margin-right: 14mm;
+  --page-margin-bottom: 16mm;
+  --page-margin-left: 14mm;
+  --page-margin-top-px: 53px;
+  --page-margin-right-px: 53px;
+  --page-margin-bottom-px: 60px;
+  --page-margin-left-px: 53px;
+  --link-color: var(--accent-800);
+  --link-decoration: none;
+  --code-font-size: 0.92em;
+  --code-white-space: pre;
+  --code-overflow-x: auto;
+}
+
+* { box-sizing: border-box; }
+
+/*
+ * 通常ページ: 本文余白（既定は上14 / 下16 / 左右14 mm）。
+ * 表紙のみ named page cover-page で余白 0（フルブリード）。
+ * ※ サイズ・余白は DocumentDesign.to_css_vars() が上書きする。
+ * ※ @page :first は使わない（表紙なし文書の1頁目まで余白ゼロになる）。
+ */
+@page {
+  size: var(--page-width) var(--page-height);
+  margin: var(--page-margin-top) var(--page-margin-right) var(--page-margin-bottom) var(--page-margin-left);
+}
+
+@page cover-page {
+  size: var(--page-width) var(--page-height);
+  margin: 0;
+}
+
+html {
+  font-size: var(--base-font-size);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--body);
+  line-height: var(--line-height);
+  letter-spacing: var(--letter-spacing);
+  background: var(--page-bg);
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  orphans: 3;
+  widows: 3;
+}
+
+/* ===== Cover（A4 全面フルブリード。背景は静的 WebP を <img.cover-bg> で挿入） ===== */
+html, body {
+  width: 100%;
+}
+
+.cover {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--page-height);
+  height: var(--page-height);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 28mm 18mm;
+  background-color: var(--cover-2);
+  color: var(--cover-fg);
+  border-radius: 0;
+  page: cover-page;
+  page-break-after: always;
+  break-after: page;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.cover > .cover-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.cover > :not(.cover-bg) {
+  position: relative;
+  z-index: 1;
+}
+
+.cover-eyebrow {
+  font-size: 10pt;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  opacity: 0.92;
+  margin-bottom: 20px;
+}
+
+.cover h1 {
+  font-size: 26pt;
+  font-weight: 700;
+  margin: 0 0 14px;
+  padding: 0;
+  border: none;
+  color: var(--cover-fg);
+  line-height: 1.35;
+}
+
+.cover .part-label {
+  display: inline-block;
+  font-size: 10pt;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 5px 14px;
+  margin-bottom: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.cover .subtitle {
+  font-size: 11.5pt;
+  opacity: 0.95;
+  margin: 0 0 28px;
+  max-width: 34em;
+  line-height: 1.7;
+}
+
+.cover .meta {
+  margin-top: auto;
+  padding-top: 22px;
+  border-top: 1px solid rgba(255, 255, 255, 0.35);
+  font-size: 9.5pt;
+  opacity: 0.95;
+}
+
+.cover .meta div { margin: 3px 0; }
+
+/* ===== Body ===== */
+/* 印刷の余白は @page。padding は付けない（改ページ後も @page が効く）。 */
+.content {
+  box-sizing: border-box;
+  padding: 0;
+}
+
+/* ===== DTP Fragmentation（泣き別れ・孤立行防止） ===== */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-weight: 700;
+  line-height: 1.4;
+  page-break-after: avoid;
+  break-after: avoid;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+h1.page-break-before,
+h2.page-break-before,
+h3.page-break-before,
+h4.page-break-before,
+h5.page-break-before,
+h6.page-break-before {
+  page-break-before: always;
+  break-before: page;
+}
+
+/* 見出し＋直後ブロックを一体として扱う（Chromium LayoutNG） */
+.ohyna-keep-next,
+.ohyna-keep {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.ohyna-keep-next.is-oversized,
+.ohyna-keep.is-oversized {
+  break-inside: auto;
+  page-break-inside: auto;
+}
+
+h1 {
+  font-size: 18pt;
+  margin: 0 0 14px;
+  padding: 4px 2px 10px;
+  border-bottom: 3px solid var(--accent-700);
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+}
+
+h2 {
+  font-size: 13.5pt;
+  margin: 22px 0 10px;
+  padding: var(--h2-padding);
+  background: var(--h2-bg);
+  border-left: var(--h2-border-left);
+  border-radius: var(--h2-radius);
+}
+
+h3 {
+  font-size: 11.5pt;
+  margin: 18px 0 8px;
+  padding: 2px 4px 5px;
+  border-bottom: 1px solid var(--accent-100);
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+}
+
+h4 {
+  font-size: 10.5pt;
+  margin: 14px 0 6px;
+  color: var(--text);
+}
+
+h1 + *,
+h2 + *,
+h3 + *,
+h4 + *,
+h5 + *,
+h6 + * {
+  page-break-before: avoid;
+  break-before: avoid;
+}
+
+p {
+  margin: 0 0 9px;
+  orphans: 3;
+  widows: 3;
+}
+
+/* 本文段落の字下げ（1文字） */
+.content > p {
+  text-indent: 1em;
+}
+
+blockquote p,
+li p,
+td p,
+th p,
+.cover p {
+  text-indent: 0;
+}
+
+a { color: var(--link-color); text-decoration: var(--link-decoration); }
+
+.ohyna-watermark {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 9999;
+  font-size: clamp(48pt, 12vw, 96pt);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--accent-800);
+  opacity: 0.07;
+  transform: rotate(-28deg);
+  user-select: none;
+  white-space: nowrap;
+}
+
+.ohyna-page-chrome {
+  position: absolute;
+  left: var(--page-margin-left);
+  right: var(--page-margin-right);
+  font-size: 8pt;
+  color: var(--muted);
+  line-height: 1.2;
+  pointer-events: none;
+  z-index: 2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ohyna-page-chrome--header {
+  top: 4mm;
+}
+
+.ohyna-page-chrome--footer {
+  bottom: 4mm;
+  text-align: center;
+}
+
+ul, ol {
+  margin: 0 0 12px;
+  padding-left: 1.35em;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+ul.is-oversized,
+ol.is-oversized {
+  page-break-inside: auto;
+  break-inside: auto;
+}
+
+li {
+  margin: 2px 0;
+  orphans: 3;
+  widows: 3;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--accent-100);
+  margin: 18px 0;
+  page-break-after: avoid;
+  break-after: avoid;
+}
+
+blockquote {
+  margin: 10px 0;
+  padding: 10px 14px;
+  background: var(--accent-25);
+  border-left: 4px solid var(--accent-600);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  color: var(--text);
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+blockquote p:last-child { margin-bottom: 0; }
+
+/* ===== 数式（KaTeX / arithmatex） ===== */
+.arithmatex {
+  font-family: KaTeX_Main, "Times New Roman", serif;
+}
+.katex {
+  font-size: 1.05em;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.katex-display {
+  margin: 0.85em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+.katex-display > .katex {
+  white-space: normal;
+}
+.katex-error {
+  color: #cf222e;
+  background: #ffebe9;
+  padding: 0.1em 0.25em;
+  border-radius: 2px;
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background: var(--accent-50);
+  color: var(--accent-900);
+  padding: 0.08em 0.35em;
+  border-radius: var(--radius-sm);
+}
+
+pre,
+.highlight {
+  background: var(--code-bg);
+  color: var(--code-fg);
+  padding: 11px 12px;
+  margin: 12px 0;
+  border-radius: var(--radius-md);
+  overflow-x: var(--code-overflow-x);
+  border: 1px solid var(--accent-800);
+  page-break-inside: avoid;
+  break-inside: avoid;
+  font-size: var(--code-font-size);
+}
+
+pre code,
+.highlight code,
+.highlight pre {
+  white-space: var(--code-white-space);
+  word-break: break-word;
+}
+
+/* 行番号（pymdownx linenums）: 外側 .highlight の枠は外し table 側に寄せる */
+.highlight:has(> .highlighttable),
+.highlight:has(> table.highlighttable) {
+  padding: 0;
+  margin: 12px 0;
+  background: transparent;
+  border: none;
+  overflow: visible;
+}
+
+.highlighttable {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0;
+  background: var(--code-bg);
+  color: var(--code-fg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--accent-800);
+  page-break-inside: avoid;
+  break-inside: avoid;
+  font-size: var(--code-font-size);
+}
+
+.highlighttable td {
+  padding: 0;
+  vertical-align: top;
+  border: none;
+}
+
+.highlighttable .linenos {
+  width: 2.5em;
+  padding: 11px 8px;
+  color: #8b949e;
+  text-align: right;
+  user-select: none;
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.highlighttable .code {
+  padding: 11px 12px;
+}
+
+.highlighttable pre {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  overflow: visible;
+}
+
+/* 連続するコードブロック同士はマージン相殺後もはっきり隙間を残す */
+pre + pre,
+pre + .highlight,
+.highlight + pre,
+.highlight + .highlight {
+  margin-top: 16px;
+}
+
+/* pymdownx.highlight は div.highlight > pre なので二重余白・枠を避ける */
+.highlight > pre {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  overflow: visible;
+}
+
+pre code,
+.highlight code,
+.highlight pre {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  border: none;
+}
+
+/* Pygments トークン（暗いコード背景向け・GUI エディタに近い配色） */
+.highlight .hll { background-color: rgba(9, 105, 218, 0.25); }
+.highlight .c, .highlight .ch, .highlight .cm, .highlight .c1, .highlight .cs { color: #8b949e; font-style: italic; }
+.highlight .k, .highlight .kc, .highlight .kd, .highlight .kn, .highlight .kp, .highlight .kr, .highlight .kt { color: #ff7b72; font-weight: 600; }
+.highlight .s, .highlight .sa, .highlight .sb, .highlight .sc, .highlight .dl, .highlight .sd, .highlight .s2, .highlight .se, .highlight .sh, .highlight .si, .highlight .sx, .highlight .sr, .highlight .s1, .highlight .ss { color: #a5d6ff; }
+.highlight .m, .highlight .mb, .highlight .mf, .highlight .mh, .highlight .mi, .highlight .mo, .highlight .il { color: #79c0ff; }
+.highlight .n, .highlight .nx { color: #e6edf3; }
+.highlight .na, .highlight .nb, .highlight .bp { color: #ffa657; }
+.highlight .nc, .highlight .nn, .highlight .ne, .highlight .nf, .highlight .fm { color: #d2a8ff; font-weight: 600; }
+.highlight .nd, .highlight .ni, .highlight .nl, .highlight .no, .highlight .nv, .highlight .vc, .highlight .vg, .highlight .vi, .highlight .vm { color: #ffa657; }
+.highlight .o, .highlight .ow { color: #ff7b72; }
+.highlight .p { color: #e6edf3; }
+.highlight .err { color: #ff7b72; background: rgba(248, 81, 73, 0.2); }
+.highlight .gd { color: #ffa198; }
+.highlight .gi { color: #7ee787; }
+.highlight .gu { color: #d2a8ff; font-weight: 700; }
+.highlight .ge { font-style: italic; }
+.highlight .gs { font-weight: 700; }
+.highlight .l, .highlight .ld { color: #a5d6ff; }
+.highlight .nx { color: #e6edf3; }
+.highlight .w { color: #e6edf3; }
+/* console / traceback / generic */
+.highlight .gp { color: #8b949e; font-weight: 600; }
+.highlight .go { color: #8b949e; }
+.highlight .gt { color: #ff7b72; }
+.highlight .gr { color: #ff7b72; }
+.highlight .gh { color: #d2a8ff; font-weight: 700; }
+.highlight .nt { color: #7ee787; font-weight: 600; }
+.highlight .cp, .highlight .cpf { color: #8b949e; }
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 10px 0 16px;
+  font-size: 9pt;
+  page-break-inside: avoid;
+  break-inside: avoid;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+thead {
+  display: table-header-group;
+}
+
+thead th {
+  background: var(--th-bg);
+  color: var(--th-fg);
+  font-weight: 600;
+  text-align: left;
+  padding: 7px 9px;
+  border-bottom: 1px solid var(--th-border);
+  border-right: 1px solid var(--th-border);
+}
+
+thead th:last-child { border-right: none; }
+
+tbody td {
+  padding: 6px 9px;
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  vertical-align: top;
+}
+
+tbody td:last-child { border-right: none; }
+tbody tr:last-child td { border-bottom: none; }
+
+tbody tr:nth-child(even) { background: var(--accent-25); }
+tbody tr:nth-child(odd) { background: var(--page-bg); }
+
+table.is-oversized {
+  page-break-inside: auto;
+  break-inside: auto;
+}
+
+dl, details, figure, figcaption {
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+dl.is-oversized,
+details.is-oversized,
+figure.is-oversized {
+  page-break-inside: auto;
+  break-inside: auto;
+}
+
+img {
+  page-break-inside: avoid;
+  break-inside: avoid;
+  max-width: 100%;
+  height: auto;
+}
+
+.diagram-wrap {
+  position: relative;
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin: 12px auto 14px;
+  padding: 10px 12px;
+  background: var(--accent-25);
+  border: 1px solid var(--accent-100);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  page-break-inside: avoid;
+  break-inside: avoid;
+  overflow: visible;
+}
+
+.diagram-error {
+  width: auto;
+  max-width: 92%;
+  text-align: left;
+  background: #fff5f5;
+  border: 1px solid #e57373;
+  color: #b71c1c;
+}
+
+.diagram-error p {
+  margin: 0 0 6px;
+  text-indent: 0;
+}
+
+.diagram-error-msg,
+.diagram-error .diagram-mermaid-source {
+  position: static;
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 6px 8px;
+  opacity: 1;
+  color: inherit;
+  font-size: 8.5pt;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow: auto;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: var(--radius-sm);
+  pointer-events: auto;
+}
+
+.diagram-error .diagram-mermaid-source {
+  margin-top: 6px;
+  max-height: 12em;
+}
+
+/* AI／コピー用: 見た目は出さず PDF テキスト抽出に残す */
+.diagram-mermaid-source {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  opacity: 0.01;
+  color: transparent;
+  font-size: 1pt;
+  line-height: 1;
+  white-space: pre-wrap;
+  border: none;
+  background: none;
+  pointer-events: none;
+}
+
+.diagram-wrap.page-break-before {
+  page-break-before: always;
+  break-before: page;
+}
+
+.diagram-wrap.is-oversized {
+  page-break-inside: auto;
+  break-inside: auto;
+  max-width: 100%;
+}
+
+/* プレビュー: クライアント Mermaid 描画前のプレースホルダ（class は ohyna-mermaid） */
+.diagram-client pre.ohyna-mermaid:not([data-processed]) {
+  display: block;
+  margin: 0;
+  padding: 18px 14px;
+  min-height: 64px;
+  text-align: left;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: var(--font-mono);
+  font-size: 8.5pt;
+  line-height: 1.45;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: var(--radius-sm);
+}
+
+.diagram-client pre.ohyna-mermaid[data-processed] {
+  display: none;
+}
+
+/* SVG が width:100% のとき fit-content 親で潰れないようにする */
+.diagram-client > svg {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto;
+}
+
+.diagram-wrap svg {
+  display: block;
+  margin: 0 auto;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  font-family: var(--font-sans) !important;
+  font-size: var(--base-font-size) !important;
+}
+
+.content.md-single {
+  page-break-before: auto;
+  break-before: auto;
+}
+
+.section {
+  page-break-before: always;
+  break-before: page;
+}
+
+.cover + .section,
+.section:first-of-type {
+  page-break-before: auto;
+  break-before: auto;
+}
+
+.nav-back,
+a[href="../README.md"] {
+  display: none !important;
+}
+
+strong {
+  color: inherit;
+  font-weight: 700;
+}
+
+li input[type="checkbox"] { margin-right: 6px; }
+
+/* 打消し・ハイライト・挿入 */
+del, s { text-decoration: line-through; opacity: 0.85; }
+mark {
+  background: #fff3bf;
+  color: inherit;
+  padding: 0 0.15em;
+  border-radius: 2px;
+}
+ins { text-decoration: underline; }
+
+/* 定義リスト */
+dl { margin: 0 0 12px; }
+dt {
+  font-weight: 700;
+  color: var(--text);
+  margin-top: 8px;
+}
+dd {
+  margin: 2px 0 8px 1.2em;
+}
+
+/* 脚注 */
+.footnote,
+.footnotes {
+  font-size: 0.9em;
+  color: var(--muted);
+  margin-top: 18px;
+  border-top: 1px solid var(--accent-100);
+  padding-top: 10px;
+}
+.footnote-ref { font-weight: 600; }
+.footnotes ol { padding-left: 1.2em; }
+
+/* admonition / details */
+.admonition {
+  margin: 12px 0;
+  padding: 10px 14px;
+  border-left: 4px solid var(--accent-600);
+  background: var(--accent-25);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  page-break-inside: avoid;
+}
+.admonition-title {
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 6px;
+}
+.admonition.warning,
+.admonition.caution {
+  border-left-color: #e65100;
+  background: #fff3e0;
+}
+.admonition.danger,
+.admonition.error {
+  border-left-color: #c62828;
+  background: #ffebee;
+}
+.admonition.tip,
+.admonition.hint {
+  border-left-color: #2e7d32;
+  background: #e8f5e9;
+}
+details {
+  margin: 10px 0;
+  padding: 8px 12px;
+  border: 1px solid var(--accent-100);
+  border-radius: var(--radius-md);
+  background: var(--accent-25);
+}
+details summary {
+  /* プレビュー／PDF とも見た目固定。開閉操作はさせない（リンクのみ操作可） */
+  cursor: default;
+  pointer-events: none;
+  font-weight: 700;
+  color: var(--text);
+  list-style: none;
+}
+details summary::-webkit-details-marker {
+  display: none;
+}
+/* プレビュー／印刷とも中身を見せる（出力は常に展開） */
+details[open] > :not(summary) {
+  display: revert;
+}
+/* タスクリストのチェックも見た目固定（クリックで状態を変えない） */
+li.task-list-item input[type="checkbox"],
+li input[type="checkbox"].task-list-item-checkbox {
+  pointer-events: none;
+  cursor: default;
+}
+/* キーボードキー <kbd> */
+kbd {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.82em;
+  font-weight: 600;
+  line-height: 1.25;
+  padding: 0.1em 0.42em;
+  margin: 0 0.06em;
+  vertical-align: baseline;
+  white-space: nowrap;
+  color: var(--text);
+  background: linear-gradient(180deg, #fafbfc 0%, var(--page-bg) 100%);
+  border: 1px solid var(--border);
+  border-bottom-color: var(--accent-100);
+  border-radius: 4px;
+  box-shadow: 0 1px 0 var(--accent-100);
+}
+
+.toc-note {
+  font-size: 9.5pt;
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+
+/*
+ * 目次: 前後とも改ページ（表紙直後は cover の break-after に任せる）。
+ * 長い目次はページをまたいでよい。
+ */
+.toc {
+  page-break-before: always;
+  break-before: page;
+  page-break-after: always;
+  break-after: page;
+  page-break-inside: auto;
+  break-inside: auto;
+  margin: 0;
+  padding: 0.2em 0 0.6em;
+}
+
+.cover + .toc,
+.cover + .ohyna-keep-next + .toc {
+  page-break-before: auto;
+  break-before: auto;
+}
+
+.toc--continued {
+  page-break-before: auto;
+  break-before: auto;
+  page-break-after: always;
+  break-after: page;
+}
+
+.toc-title {
+  font-size: 14pt;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--heading);
+  margin: 0 0 1.1em;
+  padding: 0 0 0.45em;
+  border-bottom: 1.5px solid var(--accent-200, var(--border));
+}
+
+.toc-title--continued {
+  font-size: 11pt;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  color: var(--muted);
+  border-bottom-color: var(--border);
+}
+
+.toc > ul,
+.toc .toc-list,
+.toc ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  page-break-inside: auto;
+  break-inside: auto;
+}
+
+.toc li {
+  margin: 0;
+  padding: 0;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+.toc > ul > li,
+.toc > .toc-list > li {
+  margin: 0.28em 0;
+}
+
+.toc li > ul {
+  margin: 0.1em 0 0.35em;
+  padding-left: 1.15em;
+}
+
+.toc a {
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(1.5em, 1fr) auto;
+  align-items: end;
+  column-gap: 0.4em;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 10.5pt;
+  line-height: 1.55;
+}
+
+.toc a:hover {
+  color: var(--accent-700, var(--heading));
+}
+
+.toc-text {
+  min-width: 0;
+}
+
+.toc li > ul .toc-text {
+  font-size: 10pt;
+  color: var(--body, var(--text));
+}
+
+.toc li > ul ul .toc-text {
+  font-size: 9.5pt;
+  color: var(--muted);
+}
+
+.toc-leader {
+  border-bottom: 1px dotted color-mix(in srgb, var(--muted) 75%, transparent);
+  margin-bottom: 0.4em;
+  min-height: 0.6em;
+}
+
+.toc-page {
+  font-variant-numeric: tabular-nums;
+  font-size: 10pt;
+  font-weight: 600;
+  color: var(--muted);
+  min-width: 1.4em;
+  text-align: right;
+}
+
+/* ===== Screen preview: HTML/CSS/JS による A4 用紙スタック ===== */
+@media screen {
+  /* 親 GUI の data-ohyna-color-scheme（紙は白固定。机面のみ切替） */
+  :root {
+    --ohyna-desk: #cfd6de;
+  }
+
+  html[data-ohyna-color-scheme="dark"] {
+    --ohyna-desk: #2a3038;
+    color-scheme: dark;
+  }
+
+  html[data-ohyna-color-scheme="light"] {
+    --ohyna-desk: #cfd6de;
+    color-scheme: light;
+  }
+
+  html {
+    background: var(--ohyna-desk) !important;
+  }
+
+  body {
+    background: var(--ohyna-desk) !important;
+    margin: 0;
+    width: 100%;
+    max-width: none;
+  }
+
+  /* ページ分割前（一瞬）も用紙幅で Mermaid 幅を安定させる */
+  body:not(.ohyna-a4-paginated) {
+    width: var(--page-width-px);
+    max-width: var(--page-width-px);
+    margin: 0 auto;
+    background: #fff;
+  }
+
+  body:not(.ohyna-a4-paginated) .cover {
+    width: var(--page-width-px);
+    min-height: var(--page-height-px);
+    height: var(--page-height-px);
+  }
+
+  body:not(.ohyna-a4-paginated) .content {
+    width: var(--page-width-px);
+    box-sizing: border-box;
+    padding: var(--page-margin-top-px) var(--page-margin-right-px)
+      var(--page-margin-bottom-px) var(--page-margin-left-px);
+    min-height: var(--page-height-px);
+  }
+
+  /* スクロールは body に固定（html は隠す）。ズーム補正の基準を一意にする */
+  html.ohyna-a4-paginated {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body.ohyna-a4-paginated {
+    height: 100%;
+    background: var(--ohyna-desk) !important;
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+
+  /* 左右 padding は HtmlPreview の SIDE_GUTTER_PX(32) と一致 */
+  .ohyna-a4-zoom-shell {
+    box-sizing: border-box;
+    margin: 0 auto;
+    padding: 28px 32px 40px;
+    width: max-content;
+    min-width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  /* transform はレイアウトを広げないため、拡大後サイズを slot が担う */
+  .ohyna-a4-desk-slot {
+    position: relative;
+    flex: 0 0 auto;
+    overflow: hidden;
+  }
+
+  .ohyna-a4-desk {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    width: var(--page-width-px);
+    transform: scale(var(--ohyna-zoom, 1));
+    transform-origin: 0 0;
+  }
+
+  .ohyna-a4-sheet {
+    position: relative;
+    box-sizing: border-box;
+    width: var(--page-width-px);
+    height: var(--page-height-px);
+    flex: 0 0 var(--page-height-px);
+    background: #fff;
+    color: var(--body);
+    overflow: hidden;
+    box-shadow:
+      0 1px 2px rgba(15, 23, 42, 0.12),
+      0 4px 14px rgba(15, 23, 42, 0.14);
+  }
+
+  .ohyna-a4-sheet--cover {
+    padding: 0;
+  }
+
+  .ohyna-a4-sheet--cover .cover {
+    width: 100% !important;
+    max-width: none;
+    margin: 0 !important;
+    min-height: 100% !important;
+    height: 100% !important;
+    box-shadow: none;
+    border-radius: 0;
+  }
+
+  .ohyna-a4-sheet--content .content {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    max-width: none;
+    margin: 0;
+    padding: var(--page-margin-top-px) var(--page-margin-right-px)
+      var(--page-margin-bottom-px) var(--page-margin-left-px);
+    background: #fff;
+    box-shadow: none;
+    overflow: hidden;
+  }
+
+  .ohyna-a4-sheet--content .content.is-oversized-page {
+    overflow: auto;
+  }
+}

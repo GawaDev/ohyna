@@ -1,0 +1,19 @@
+---
+description: ohyna は単一ドキュメント（1 Markdown → 1 PDF）のみ。多章・プロジェクトビルドは作らない
+alwaysApply: true
+---
+
+# 単一ドキュメントのみ
+
+製品の面は **1 つの Markdown → 1 つの PDF**（GUI／`POST /preview`・`/pdf`・`/analyze`／CLI `pdf`・`serve`）。
+
+## やらない
+
+- 多章プロジェクト（`ohyna.json` / books / 章単結合）
+- `/build` や冊子 ZIP など GUI に無い経路の再追加
+- 「単票と多章」の二系統設計
+
+## やる
+
+- 画面・API・CLI・docs・サンプルを単一文書の現行契約に揃える
+- 新機能も単一文書の編集・検査・プレビュー・PDF の範囲で設計する

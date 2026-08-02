@@ -1,0 +1,47 @@
+# Ohyna
+
+> Ohyna（Open Hybrid Note App／おひな）— ブラウザで Markdown を編集し、検査・プレビューのうえ 1 文書を印刷品質 PDF にする製品です。文書設定は先頭 YAML の `ohyna:` 配下です。
+
+製品の面は単一ドキュメント（1 Markdown → 1 PDF）です。画面ヘルプと HTTP API（`/analyze`・`/preview`・`/pdf`）が利用者向けの正本です。
+
+## Docs
+
+- [はじめに](/docs/manual/01-intro.md): 製品概要と標準の作業の流れ
+- [画面とファイル操作](/docs/manual/02-ui-and-files.md): 開く・保存・未保存の扱い
+- [ドキュメント設定](/docs/manual/03-settings.md): `ohyna:` の設定項目
+- [本文の書き方](/docs/manual/04-writing.md): Ohyna Markdown 記法
+- [確認と PDF 出力](/docs/manual/05-preview-and-pdf.md): 検査・プレビュー・PDF
+- [困ったとき](/docs/manual/06-troubleshooting.md): よくある問題
+- [概要と方針](/docs/spec/00-概要と方針.md): 利用者向け方針
+- [文書設定リファレンス](/docs/spec/03-文書設定リファレンス.md): front matter キー一覧
+- [印刷とプレビュー](/docs/spec/05-印刷とプレビュー.md): 用紙・プレビュー／PDF
+- [入力解読仕様](/docs/spec/08-入力解読仕様.md): 入力契約
+- [出力仕様](/docs/spec/09-出力仕様.md): 出力契約
+- [準拠仕様マップ](/docs/spec/10-準拠仕様マップ.md): 外部仕様との境界
+- [サイトメタと WebMCP](/docs/spec/11-サイトメタとWebMCP.md): llms・sitemap・WebMCP
+- [MIT License](/docs/license/01-mit.md): ライセンス本文
+- [第三者コンポーネント](/docs/license/02-third-party.md): 第三者表記
+
+## API
+
+- [ヘルプ文書一覧](/docs): JSON カタログ
+- [ヘルスチェック](/health): サービス状態（`webmcp` フィールドあり）
+- [色テーマ一覧](/styles): プリセット名と表紙色
+- [WebMCP ツールカタログ](/webmcp.json): ブラウザ WebMCP で登録するツール一覧（JSON）
+
+## WebMCP
+
+タブ内エージェント向けツールは **GUI を開いたとき**に登録されます（サーバ常駐の MCP トランスポートではありません）。
+
+- 画面: [/gui/](/gui/)
+- カタログ: [/webmcp.json](/webmcp.json)
+- 入口ツール: `ohyna_describe`（概要とツール名一覧）
+- 主な操作: `ohyna_get_markdown` / `ohyna_set_markdown` / `ohyna_analyze` / `ohyna_prepare_pdf` / `ohyna_print_pdf`
+- 無効化: ブラウザで `localStorage.setItem("ohyna-webmcp","0")` のうえ再読込
+
+## Optional
+
+- [サイトマップ](/sitemap.xml): 公開 URL 一覧
+- [robots.txt](/robots.txt): クローラ向け案内
+- [security.txt](/.well-known/security.txt): 脆弱性報告の連絡先
+- [llms-full.txt](/llms-full.txt): ヘルプ本文の連結（長大）

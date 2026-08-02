@@ -1,0 +1,15 @@
+# Ohyna — crawler hints
+User-agent: *
+Allow: /
+Allow: /gui/
+Allow: /docs
+Allow: /llms.txt
+Allow: /webmcp.json
+Allow: /sitemap.xml
+Allow: /health
+Disallow: /preview
+Disallow: /pdf
+Disallow: /analyze
+Disallow: /covers/
+
+Sitemap: /sitemap.xml

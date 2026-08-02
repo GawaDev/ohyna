@@ -1,0 +1,67 @@
+{
+  "app": "Ohyna",
+  "version": "1.0.0",
+  "protocol": "WebMCP",
+  "page": "/gui/",
+  "spec": "https://webmachinelearning.github.io/webmcp/",
+  "chromeDocs": "https://developer.chrome.com/docs/ai/webmcp/imperative-api",
+  "registration": [
+    "navigator.modelContext.registerTool",
+    "document.modelContext.registerTool"
+  ],
+  "permissionsPolicy": "tools=(self)",
+  "disableFlag": "localStorage ohyna-webmcp=0 then reload",
+  "notes": [
+    "ツールは /gui/ を開いたタブ内でのみ有効（サーバ常駐 MCP ではない）",
+    "プレビューは見た目確認のみ（リンクジャンプ不可）",
+    "PDF のディスク保存はユーザの保存ダイアログ操作が必要"
+  ],
+  "tools": [
+    {
+      "name": "ohyna_describe",
+      "description": "製品概要とツール一覧",
+      "readOnlyHint": true
+    },
+    {
+      "name": "ohyna_get_status",
+      "description": "未保存・検査・PDF 状態",
+      "readOnlyHint": true
+    },
+    {
+      "name": "ohyna_get_markdown",
+      "description": "編集中 Markdown 全文",
+      "readOnlyHint": true
+    },
+    {
+      "name": "ohyna_set_markdown",
+      "description": "Markdown 全文の置き換え",
+      "untrustedContentHint": true
+    },
+    {
+      "name": "ohyna_get_document_settings",
+      "description": "ohyna: 設定の要約",
+      "readOnlyHint": true
+    },
+    {
+      "name": "ohyna_analyze",
+      "description": "静的解析（POST /analyze）",
+      "readOnlyHint": true
+    },
+    {
+      "name": "ohyna_refresh_preview",
+      "description": "プレビュー再取得"
+    },
+    {
+      "name": "ohyna_prepare_pdf",
+      "description": "PDF 生成＋確認 UI"
+    },
+    {
+      "name": "ohyna_print_pdf",
+      "description": "OS 印刷ダイアログへ渡す"
+    },
+    {
+      "name": "ohyna_open_help",
+      "description": "画面内ヘルプ（任意 docId）"
+    }
+  ]
+}

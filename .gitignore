@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+.venv*/
+venv/
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+
+# Node / ビルド
+web/node_modules/
+web/dist/
+
+# 秘密情報・ローカル設定
+.env
+.env.*
+!.env.example
+*.pem
+credentials*.json
+
+# 生成物・作業フォルダ
+out/
+**/out/
+.examples-out/
+_qa_gui/
+_qa_styles/
+_style_check/
+web/_qa_styles/
+_ui_debug.png
+_ui_layout.json
+_ui_*.png
+_ui_*.json
+*.pdf
+
+# OS / エディタ
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/

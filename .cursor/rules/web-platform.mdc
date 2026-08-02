@@ -1,0 +1,25 @@
+---
+description: GUI では適切な Web／HTML5 API を使う（FSA・Worker・D&D など）
+globs: MarkdownToPDF/web/src/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Web プラットフォーム API
+
+## ファイル
+
+- 開く／保存は File System Access（`showOpenFilePicker` / `showSaveFilePicker`）。`id` と `startIn` でフォルダ記憶する。
+- ドロップ開封では可能なら `DataTransferItem.getAsFileSystemHandle` でハンドルも取り、以降の上書き保存につなげる。
+- 未対応環境だけ `<input type="file">` / `a.download` に落とす。
+- **起動時:** 前回の `FileSystemFileHandle` を IndexedDB から復元して開く。失敗時は空の無題＋通知。一度も開く／保存／新規していない初回だけサンプル。起動時にピッカーを自動表示しない。
+- **Mermaid フェンス:** 編集色分けは `mermaid` / `mermaid-code` とも Mermaid モード。表示はサーバ契約に従い、`mermaid`＝図、`mermaid code`＝コード。
+
+## 重い処理
+
+- PDF 描画は pdf.js Worker（メインスレッドでパースしない）。
+- プレビュー寸法は ResizeObserver。
+
+## やらないこと
+
+- サーバー必須の PDF 生成を Service Worker でオフライン完結させようとしない。
+- ネイティブ `<dialog>` のために動いている Mantine Modal を無理に置き換えない。

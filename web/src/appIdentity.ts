@@ -5,7 +5,7 @@ export const APP_NAME = "Ohyna";
 export const APP_NAME_FULL = "Ohyna（Open Hybrid Note App／おひな）";
 
 export const APP_DESCRIPTION =
-  "Markdown を編集・検査・プレビューし、印刷品質の PDF を作成する Ohyna（おひな）。";
+  "Markdown を編集・検査・プレビューし、印刷向け PDF を作成するアプリケーション。";
 
 export const APP_THEME_COLOR = "#0b6bcb";
 

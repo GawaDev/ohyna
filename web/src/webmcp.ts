@@ -130,25 +130,23 @@ function buildTools(handlers: WebMcpHandlers): ModelContextTool[] {
   const tools: ModelContextTool[] = [
     {
       name: "ohyna_describe",
-      description:
-        "Ohyna（おひな）の概要と、このタブで使える WebMCP ツール一覧を返す。最初に呼ぶとよい。",
+      description: "製品概要と、このタブで利用できる WebMCP ツール一覧を返す。",
       inputSchema: EMPTY_SCHEMA,
       annotations: { readOnlyHint: true },
       execute: async () => ({
         app: "Ohyna",
-        role: "Markdown 編集・検査・プレビュー・PDF 作成（確認 UI）",
+        role: "Markdown の編集・検査・プレビュー・PDF 作成",
         page: "/gui/",
         notes: [
-          "プレビューは見た目確認のみ（リンクジャンプ・折りたたみ操作は不可）",
-          "PDF のディスク保存と印刷ダイアログはユーザ操作が必要な場合がある",
+          "プレビューは体裁確認用です",
+          "PDF の保存と印刷は利用者の操作が必要な場合があります",
         ],
         tools: [...WEBMCP_TOOL_NAMES],
       }),
     },
     {
       name: "ohyna_get_status",
-      description:
-        "ドキュメント名、未保存か、設定完了、検査ゲート、PDF 生成中などの状態を返す。",
+      description: "文書名、未保存状態、設定、検査結果、PDF 生成状態を返す。",
       inputSchema: EMPTY_SCHEMA,
       annotations: { readOnlyHint: true },
       execute: async () => handlers.getStatus(),
@@ -163,8 +161,7 @@ function buildTools(handlers: WebMcpHandlers): ModelContextTool[] {
     },
     {
       name: "ohyna_set_markdown",
-      description:
-        "エディタの Markdown 全文を指定文字列で置き換える。未保存扱いになりうる。",
+      description: "エディタの Markdown 全文を指定文字列で置き換える。",
       inputSchema: {
         type: "object",
         properties: {
@@ -194,16 +191,14 @@ function buildTools(handlers: WebMcpHandlers): ModelContextTool[] {
     },
     {
       name: "ohyna_analyze",
-      description:
-        "編集中の Markdown を静的解析し、問題一覧を返す（サーバ POST /analyze）。",
+      description: "編集中の Markdown を検査し、問題一覧を返す。",
       inputSchema: EMPTY_SCHEMA,
       annotations: { readOnlyHint: true },
       execute: async () => handlers.analyze(),
     },
     {
       name: "ohyna_refresh_preview",
-      description:
-        "検査通過後にプレビュー HTML を再取得する。error がある場合は失敗しうる。",
+      description: "プレビューを再取得する。問題がある場合は失敗します。",
       inputSchema: EMPTY_SCHEMA,
       execute: async () => {
         await handlers.refreshPreview();
@@ -212,15 +207,13 @@ function buildTools(handlers: WebMcpHandlers): ModelContextTool[] {
     },
     {
       name: "ohyna_prepare_pdf",
-      description:
-        "検査通過後に PDF を生成し、確認 UI を開く。ファイル保存は「PDFを保存」、印刷は ohyna_print_pdf。",
+      description: "PDF を生成し、確認画面を開く。保存は画面の「PDFを保存」、印刷は ohyna_print_pdf。",
       inputSchema: EMPTY_SCHEMA,
       execute: async () => handlers.preparePdf(),
     },
     {
       name: "ohyna_print_pdf",
-      description:
-        "生成済み PDF を OS の印刷ダイアログへ渡す。未生成なら先に生成して確認 UI を開いてから印刷する。",
+      description: "生成済み PDF を OS の印刷ダイアログへ渡す。未生成の場合は先に生成します。",
       inputSchema: EMPTY_SCHEMA,
       execute: async () => handlers.printPdf(),
     },
@@ -230,8 +223,7 @@ function buildTools(handlers: WebMcpHandlers): ModelContextTool[] {
     const openHelp = handlers.openHelp;
     tools.push({
       name: "ohyna_open_help",
-      description:
-        "画面内ヘルプを開く。docId があればその文書を表示する（例: manual/01-intro.md）。",
+      description: "画面内ヘルプを開く。docId を指定すると該当文書を表示する。",
       inputSchema: {
         type: "object",
         properties: {

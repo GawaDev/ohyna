@@ -1,12 +1,12 @@
 # Ohyna
 
-> Ohyna（Open Hybrid Note App／おひな）— ブラウザで Markdown を編集し、検査・プレビューのうえ 1 文書を印刷品質 PDF にする製品です。文書設定は先頭 YAML の `ohyna:` 配下です。
+> Ohyna（Open Hybrid Note App／おひな）は、ブラウザで Markdown を編集し、検査とプレビューのうえ 1 文書を印刷向け PDF にする製品です。文書設定は先頭 YAML の `ohyna:` 配下に記述します。
 
-製品の面は単一ドキュメント（1 Markdown → 1 PDF）です。画面ヘルプと HTTP API（`/analyze`・`/preview`・`/pdf`）が利用者向けの正本です。
+扱う単位は単一ドキュメント（1 Markdown → 1 PDF）です。利用者向けの説明は画面ヘルプ、プログラム連携は HTTP API（`/analyze`・`/preview`・`/pdf`）を参照してください。
 
 ## Docs
 
-- [はじめに](/docs/manual/01-intro.md): 製品概要と標準の作業の流れ
+- [はじめに](/docs/manual/01-intro.md): 製品概要と標準の作業手順
 - [画面とファイル操作](/docs/manual/02-ui-and-files.md): 開く・保存・未保存の扱い
 - [ドキュメント設定](/docs/manual/03-settings.md): `ohyna:` の設定項目
 - [本文の書き方](/docs/manual/04-writing.md): Ohyna Markdown 記法
@@ -27,21 +27,21 @@
 - [ヘルプ文書一覧](/docs): JSON カタログ
 - [ヘルスチェック](/health): サービス状態（`webmcp` フィールドあり）
 - [色テーマ一覧](/styles): プリセット名と表紙色
-- [WebMCP ツールカタログ](/webmcp.json): ブラウザ WebMCP で登録するツール一覧（JSON）
+- [WebMCP ツールカタログ](/webmcp.json): WebMCP で登録するツール一覧（JSON）
 
 ## WebMCP
 
-タブ内エージェント向けツールは **GUI を開いたとき**に登録されます（サーバ常駐の MCP トランスポートではありません）。
+タブ内エージェント向けツールは GUI を開いたときに登録されます。
 
 - 画面: [/gui/](/gui/)
 - カタログ: [/webmcp.json](/webmcp.json)
-- 入口ツール: `ohyna_describe`（概要とツール名一覧）
-- 主な操作: `ohyna_get_markdown` / `ohyna_set_markdown` / `ohyna_analyze` / `ohyna_prepare_pdf` / `ohyna_print_pdf`
-- 無効化: ブラウザで `localStorage.setItem("ohyna-webmcp","0")` のうえ再読込
+- 入口: `ohyna_describe`（概要とツール名一覧）
+- 操作例: `ohyna_get_markdown` / `ohyna_set_markdown` / `ohyna_analyze` / `ohyna_prepare_pdf` / `ohyna_print_pdf`
+- 無効化: `localStorage.setItem("ohyna-webmcp","0")` のあと再読込
 
 ## Optional
 
 - [サイトマップ](/sitemap.xml): 公開 URL 一覧
 - [robots.txt](/robots.txt): クローラ向け案内
 - [security.txt](/.well-known/security.txt): 脆弱性報告の連絡先
-- [llms-full.txt](/llms-full.txt): ヘルプ本文の連結（長大）
+- [llms-full.txt](/llms-full.txt): ヘルプ本文の連結

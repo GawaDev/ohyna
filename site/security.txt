@@ -1,7 +1,7 @@
 # Ohyna security contacts (RFC 9116)
 # Operators: set OHYNA_SECURITY_CONTACT to override Contact.
 
-Contact: https://github.com/
+Contact: https://github.com/GawaDev/ohyna/security/advisories/new
 Preferred-Languages: ja, en
 Canonical: /.well-known/security.txt
 Policy: /llms.txt

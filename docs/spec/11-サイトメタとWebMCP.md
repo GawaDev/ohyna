@@ -56,7 +56,7 @@
 
 | ツール | 内容 | 注記 |
 |--------|------|------|
-| `ohyna_describe` | 製品概要とツール名一覧 | `readOnlyHint`。入口として最初に呼ぶとよい |
+| `ohyna_describe` | 製品概要とツール名一覧 | `readOnlyHint` |
 | `ohyna_get_status` | 未保存・検査ゲート・PDF 状態など | `readOnlyHint` |
 | `ohyna_get_markdown` | 編集中 Markdown 全文 | `readOnlyHint` |
 | `ohyna_set_markdown` | Markdown 全文の置き換え | `untrustedContentHint` |

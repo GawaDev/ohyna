@@ -12,9 +12,9 @@
   "permissionsPolicy": "tools=(self)",
   "disableFlag": "localStorage ohyna-webmcp=0 then reload",
   "notes": [
-    "ツールは /gui/ を開いたタブ内でのみ有効（サーバ常駐 MCP ではない）",
-    "プレビューは見た目確認のみ（リンクジャンプ不可）",
-    "PDF のディスク保存はユーザの保存ダイアログ操作が必要"
+    "ツールは /gui/ を開いたタブ内で有効",
+    "プレビューは体裁確認用",
+    "PDF のディスク保存は利用者の保存操作が必要"
   ],
   "tools": [
     {
@@ -44,7 +44,7 @@
     },
     {
       "name": "ohyna_analyze",
-      "description": "静的解析（POST /analyze）",
+      "description": "内容検査",
       "readOnlyHint": true
     },
     {
@@ -53,7 +53,7 @@
     },
     {
       "name": "ohyna_prepare_pdf",
-      "description": "PDF 生成＋確認 UI"
+      "description": "PDF 生成と確認画面"
     },
     {
       "name": "ohyna_print_pdf",

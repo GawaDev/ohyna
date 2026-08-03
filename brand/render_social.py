@@ -12,12 +12,21 @@ PUB = ROOT.parent / "web" / "public"
 SHOTS = PUB / "screenshots"
 MARK = ROOT / "ohyna-mark.png"
 
-# ブランド
-BG = (11, 107, 203)  # #0b6bcb
-BG_DARK = (8, 72, 140)
+# ブランド（web/src/appIdentity.ts の APP_THEME_COLOR / APP_PRIMARY_COLOR と同じ）
+THEME_HEX = "#FFB903"
+PRIMARY_HEX = "#FF8E01"
+
+
+def _hex_rgb(hex_color: str) -> tuple[int, int, int]:
+    h = hex_color.removeprefix("#")
+    return (int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16))
+
+
+BG = _hex_rgb(THEME_HEX)
+BG_DARK = _hex_rgb(PRIMARY_HEX)
 WHITE = (255, 255, 255)
 INK = (15, 23, 42)
-MUTED = (100, 116, 139)
+MUTED = (70, 55, 20)
 
 
 def _font(size: int, bold: bool = False) -> ImageFont.ImageFont:
@@ -53,11 +62,11 @@ def render_og() -> None:
     _paste_mark(img, 220, (80, 120))
     title = _font(72, bold=True)
     body = _font(32)
-    draw.text((340, 160), "Ohyna", fill=WHITE, font=title)
+    draw.text((340, 160), "Ohyna", fill=INK, font=title)
     draw.text(
         (340, 260),
         "Open Hybrid Note App／おひな",
-        fill=(220, 235, 255),
+        fill=MUTED,
         font=body,
     )
     draw.text(
@@ -90,7 +99,7 @@ def render_screenshot_wide() -> None:
     ):
         draw.text((84, 190 + i * 36), line, fill=INK, font=_font(24))
     _paste_mark(img, 120, (900, 280))
-    draw.text((860, 430), "A4 プレビュー", fill=MUTED, font=_font(22))
+    draw.text((860, 430), "プレビュー", fill=MUTED, font=_font(22))
     SHOTS.mkdir(parents=True, exist_ok=True)
     out = SHOTS / "wide.png"
     img.convert("RGB").save(out, "PNG", optimize=True)
@@ -104,7 +113,7 @@ def render_screenshot_narrow() -> None:
     draw = ImageDraw.Draw(img)
     draw.rounded_rectangle((24, 48, w - 24, h - 48), radius=28, fill=WHITE, outline=(226, 232, 240), width=2)
     draw.rectangle((24, 48, w - 24, 140), fill=BG)
-    draw.text((48, 78), "Ohyna", fill=WHITE, font=_font(36, bold=True))
+    draw.text((48, 78), "Ohyna", fill=INK, font=_font(36, bold=True))
     _paste_mark(img, 160, ((w - 160) // 2, 220))
     draw.text(
         (w // 2, 420),

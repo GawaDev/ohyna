@@ -43,6 +43,7 @@ type Props = {
 
 type FitMode = "contain" | "width" | "height";
 
+/** フィット基準の既定寸法（A4 @ 96dpi）。PDF 実寸はページごとに測る */
 const A4_WIDTH_PX = 794;
 const A4_HEIGHT_PX = 1123;
 const ZOOM_MIN = 0.25;

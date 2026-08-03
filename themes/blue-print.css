@@ -1001,7 +1001,7 @@ kbd {
   text-align: right;
 }
 
-/* ===== Screen preview: HTML/CSS/JS による A4 用紙スタック ===== */
+/* ===== Screen preview: HTML/CSS/JS による用紙スタック ===== */
 @media screen {
   /* 親 GUI の data-ohyna-color-scheme（紙は白固定。机面のみ切替） */
   :root {

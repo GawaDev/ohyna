@@ -1,6 +1,6 @@
 ﻿# Ohyna
 
-**Ohyna**（Open Hybrid Note App／おひな）は、Markdown 文書を A4 の印刷向け PDF に変換するアプリケーションです。Web GUI・HTTP API・CLI を備え、1 つの Markdown から 1 つの PDF を出力します。
+**Ohyna**（Open Hybrid Note App／おひな）は、Markdown 文書を印刷向け PDF に変換するアプリケーションです（用紙は A4／A5／B5／Letter、既定は A4 縦）。Web GUI・HTTP API・CLI を備え、1 つの Markdown から 1 つの PDF を出力します。
 
 | | |
 |--|--|

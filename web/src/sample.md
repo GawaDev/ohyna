@@ -85,7 +85,7 @@ Ohyna が扱う入力は、製品が定義する文書形式 **Ohyna Markdown** 
 |------|--------|
 | 数式 | KaTeX（版固定）が解釈する TeX の範囲。`$` / `$$`／数式フェンスなど |
 | 図 | Mermaid（メジャー 11 系）が解釈する構文。フェンス形式は製品契約 |
-| 用紙 | **ISO 216 A4**。余白はテーマの CSS `@page` |
+| 用紙 | 設定の用紙サイズ（A4／A5／JIS B5／Letter。既定 ISO 216 A4）。余白はテーマの CSS `@page` |
 | 目次 | `[TOC]`。タイトル「目次」、続きは「目次（続き）」 |
 | 画面プレビュー | 確認用の**近似**。リンクはジャンプしない。ページ割の正式結果は PDF |
 | PDF | Chromium 印刷による配布用の成果物。確認画面で保存・印刷できる |
@@ -824,7 +824,7 @@ architecture-beta
 requirementDiagram
   requirement pdf_output {
     id: "R-1"
-    text: "Export A4 PDF from Markdown"
+    text: "Export print PDF from Markdown"
     risk: medium
     verifymethod: test
   }

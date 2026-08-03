@@ -294,7 +294,7 @@ export function SettingsModal({
         {option.label}
       </Text>
       {checked ? (
-        <CheckIcon size={14} color="var(--mantine-color-blue-6)" />
+        <CheckIcon size={14} color="var(--mantine-color-ohyna-6)" />
       ) : null}
     </Group>
   );
@@ -315,7 +315,7 @@ export function SettingsModal({
         {option.label}
       </Text>
       {checked ? (
-        <CheckIcon size={14} color="var(--mantine-color-blue-6)" />
+        <CheckIcon size={14} color="var(--mantine-color-ohyna-6)" />
       ) : null}
     </Group>
   );

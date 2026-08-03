@@ -24,6 +24,7 @@ import {
 } from "@tabler/icons-react";
 import { marked } from "marked";
 import { APP_NAME, APP_VERSION } from "./brand";
+import { APP_COLOR_NAME } from "./brandColors";
 
 export type HelpDocItem = {
   id: string;
@@ -45,7 +46,7 @@ const GROUP_META: Record<
   string,
   { label: string; color: string; Icon: typeof IconBook2 }
 > = {
-  マニュアル: { label: "マニュアル", color: "blue", Icon: IconBook2 },
+  マニュアル: { label: "マニュアル", color: APP_COLOR_NAME, Icon: IconBook2 },
   仕様書: { label: "仕様書", color: "violet", Icon: IconScale },
   ライセンス: { label: "ライセンス", color: "gray", Icon: IconLicense },
 };

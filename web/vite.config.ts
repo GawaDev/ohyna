@@ -26,6 +26,12 @@ export default defineConfig({
     __OHYNA_VERSION__: JSON.stringify(appVersion),
   },
   plugins: [
+    {
+      name: "ohyna-theme-color-html",
+      transformIndexHtml(html) {
+        return html.replaceAll("__OHYNA_THEME_COLOR__", APP_THEME_COLOR);
+      },
+    },
     react(),
     VitePWA({
       registerType: "autoUpdate",

@@ -22,6 +22,7 @@ import {
   IconWindowMaximize,
   IconX,
 } from "@tabler/icons-react";
+import { APP_COLOR_NAME } from "./brandColors";
 import { formatDiagItem, formatLineRef } from "./diagFormat";
 import type { MdDiagnostic } from "./mdAnalysis";
 import { summarizeDiagnostics } from "./mdAnalysis";
@@ -77,7 +78,7 @@ function levelIcon(level: ConsoleLevel) {
     case "success":
       return <IconCheck size={size} color="var(--mantine-color-teal-6)" />;
     default:
-      return <IconInfoCircle size={size} color="var(--mantine-color-blue-6)" />;
+      return <IconInfoCircle size={size} color="var(--mantine-color-ohyna-6)" />;
   }
 }
 
@@ -471,7 +472,6 @@ export function MessageConsole({
                 <ActionIcon
                   size="sm"
                   variant="light"
-                  color="blue"
                   aria-label="コンソールを前面へ"
                   onClick={onFocusPopOut}
                 >
@@ -593,7 +593,7 @@ export function MessageConsole({
                               ? "red"
                               : d.severity === "warning"
                                 ? "orange"
-                                : "blue"
+                                : APP_COLOR_NAME
                           }
                           styles={{ root: { flexShrink: 0, marginTop: 2 } }}
                         >

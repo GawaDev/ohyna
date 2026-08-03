@@ -72,6 +72,7 @@ import {
   type DocumentSettings,
 } from "./frontmatter";
 import { APP_MARK_SRC, APP_NAME, APP_NAME_FULL, APP_VERSION } from "./brand";
+import { APP_COLOR_NAME } from "./brandColors";
 import { tryRegisterWebMcpTools } from "./webmcp";
 import { HtmlPreview } from "./HtmlPreview";
 import {
@@ -1293,7 +1294,7 @@ export default function App() {
     }
     if (!opts?.silent) {
       notify({
-        color: "blue",
+        color: APP_COLOR_NAME,
         title: "開きました",
         message: result.name,
         autoClose: 2000,
@@ -1317,20 +1318,20 @@ export default function App() {
     setFileMenuOpen(false);
     if (nav.type === "close") {
       notify({
-        color: "blue",
+        color: APP_COLOR_NAME,
         title: "閉じました",
         message: "編集中のドキュメントを終えました",
         autoClose: 2000,
       });
     } else if (nav.template === "sample") {
       notify({
-        color: "blue",
+        color: APP_COLOR_NAME,
         title: "サンプルを開きました",
         autoClose: 2000,
       });
     } else {
       notify({
-        color: "blue",
+        color: APP_COLOR_NAME,
         title: "新しいドキュメント",
         autoClose: 2000,
       });
@@ -1868,7 +1869,6 @@ export default function App() {
               <Group gap={6} wrap="nowrap" style={{ flexShrink: 0 }}>
                 <Button
                   size={chromeBtnSize}
-                  color="blue"
                   loading={restoreBusy}
                   onClick={() => void restorePreviousFile()}
                 >
@@ -2100,7 +2100,6 @@ export default function App() {
                   <ActionIcon
                     size={chromeIconSize}
                     variant="light"
-                    color="blue"
                     aria-label="プレビューを前面へ"
                     onClick={focusPreviewWindow}
                   >

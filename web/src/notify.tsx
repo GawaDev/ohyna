@@ -17,6 +17,7 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import type { ReactNode } from "react";
+import { APP_COLOR_NAME } from "./brandColors";
 import {
   appendConsoleEntry,
   type ConsoleLevel,
@@ -58,7 +59,7 @@ function colorForLevel(level: ConsoleLevel): string {
     case "success":
       return "teal";
     default:
-      return "blue";
+      return APP_COLOR_NAME;
   }
 }
 

@@ -41,7 +41,7 @@ type Props = {
 
 type FitMode = "contain" | "width" | "height" | "manual";
 
-/** A4 @ 96dpi（プレビュー HTML 内の用紙サイズと一致） */
+/** 既定用紙（A4）@ 96dpi。実寸はプレビュー HTML から受け取る */
 const A4_WIDTH_PX = 794;
 const A4_HEIGHT_PX = 1123;
 const ZOOM_MIN = 0.25;
@@ -678,7 +678,7 @@ export const HtmlPreview = memo(function HtmlPreview({
             <iframe
               ref={iframeRef}
               className="ohyna-html-frame-fill"
-              title="A4 ドキュメントプレビュー"
+              title="ドキュメントプレビュー"
               sandbox="allow-scripts"
               src={frameSrc}
               onLoad={onFrameLoad}

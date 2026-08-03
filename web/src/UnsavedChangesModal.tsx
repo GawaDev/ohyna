@@ -61,7 +61,6 @@ export function UnsavedChangesModal({
             キャンセル
           </Button>
           <Button
-            color="blue"
             loading={saving}
             onClick={onSave}
           >

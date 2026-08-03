@@ -92,19 +92,19 @@ html body {
     transform 140ms ease;
 }
 .ohyna-font-option:hover {
-  border-color: var(--mantine-color-blue-3);
+  border-color: var(--mantine-color-ohyna-3);
   box-shadow: 0 4px 14px rgba(15, 23, 42, 0.07);
   transform: translateY(-1px);
 }
 .ohyna-font-option--active {
-  border-color: var(--mantine-color-blue-6);
+  border-color: var(--mantine-color-ohyna-6);
   background: linear-gradient(
     180deg,
-    var(--mantine-color-blue-0) 0%,
+    var(--mantine-color-ohyna-0) 0%,
     #fff 72%
   );
   box-shadow:
-    inset 0 0 0 1px var(--mantine-color-blue-6),
+    inset 0 0 0 1px var(--mantine-color-ohyna-6),
     0 4px 14px rgba(25, 118, 210, 0.12);
 }
 .ohyna-font-option-check {
@@ -117,7 +117,7 @@ html body {
   width: 20px;
   height: 20px;
   border-radius: 999px;
-  background: var(--mantine-color-blue-6);
+  background: var(--mantine-color-ohyna-6);
   color: #fff;
   flex-shrink: 0;
 }
@@ -141,7 +141,7 @@ html body {
 }
 .ohyna-font-option--active .ohyna-font-option-sample {
   background: #fff;
-  border-color: var(--mantine-color-blue-1);
+  border-color: var(--mantine-color-ohyna-1);
 }
 .ohyna-font-option-sample-ja {
   display: block;
@@ -169,7 +169,7 @@ html body {
 }
 .ohyna-font-option--mono.ohyna-font-option--active .ohyna-font-option-sample {
   background: #0f172a;
-  border-color: var(--mantine-color-blue-6);
+  border-color: var(--mantine-color-ohyna-6);
 }
 
 /* スクリーンリーダー専用（視覚非表示・読み上げ用） */
@@ -201,7 +201,7 @@ html body {
   background: var(--mantine-color-gray-1);
 }
 .ohyna-diag-item--jump:focus-visible {
-  outline: 2px solid var(--mantine-color-blue-5);
+  outline: 2px solid var(--mantine-color-ohyna-5);
   outline-offset: 1px;
 }
 
@@ -213,7 +213,7 @@ html body {
   border-bottom: 2px wavy #bf8700;
 }
 .ohyna-editor-wrap .cm-diagnostic-info {
-  border-bottom: 2px wavy #0969da;
+  border-bottom: 2px wavy var(--mantine-color-ohyna-6);
 }
 .ohyna-editor-wrap .cm-lintRange-error {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='3'%3E%3Cpath d='M0 2.5 Q1.5 0 3 2.5 Q4.5 5 6 2.5' fill='none' stroke='%23cf222e' stroke-width='1'/%3E%3C/svg%3E");
@@ -277,7 +277,6 @@ html body {
 .ohyna-settings-actions {
   flex-shrink: 0;
   padding-top: 4px;
-  border-top: 1px solid var(--mantine-color-gray-2);
 }
 
 /* 色テーマ・表紙デザインの見本 */
@@ -846,7 +845,7 @@ html body {
 }
 
 .ohyna-corner-resize:focus-visible {
-  outline: 2px solid var(--mantine-color-blue-5);
+  outline: 2px solid var(--mantine-color-ohyna-5);
   outline-offset: 1px;
 }
 
@@ -1036,7 +1035,7 @@ html body {
 .ohyna-app .mantine-AppShell-header .mantine-ActionIcon-root:focus-visible,
 .ohyna-pane-head .mantine-ActionIcon-root:focus-visible,
 .ohyna-pane-head .mantine-Button-root:focus-visible {
-  outline: 2px solid var(--mantine-color-blue-5);
+  outline: 2px solid var(--mantine-color-ohyna-5);
   outline-offset: 2px;
 }
 
@@ -1318,7 +1317,7 @@ html body {
   --ohyna-help-paper: var(--mantine-color-body);
   --ohyna-help-code-bg: var(--mantine-color-gray-1);
   --ohyna-help-pre-bg: #f4f6f8;
-  --ohyna-help-accent: var(--mantine-color-blue-6);
+  --ohyna-help-accent: var(--mantine-color-ohyna-6);
   display: flex !important;
   flex-direction: column !important;
   height: 100% !important;
@@ -1400,11 +1399,11 @@ html body {
     box-shadow 140ms ease;
 }
 .ohyna-help-nav-link-root:hover {
-  background: color-mix(in srgb, var(--mantine-color-blue-0) 80%, transparent) !important;
+  background: color-mix(in srgb, var(--mantine-color-ohyna-0) 80%, transparent) !important;
 }
 .ohyna-help-nav-link-root[data-active] {
-  background: color-mix(in srgb, var(--mantine-color-blue-1) 90%, #fff) !important;
-  color: var(--mantine-color-blue-8) !important;
+  background: color-mix(in srgb, var(--mantine-color-ohyna-1) 90%, #fff) !important;
+  color: var(--mantine-color-ohyna-8) !important;
   box-shadow: inset 3px 0 0 var(--ohyna-help-accent);
   font-weight: 600;
 }
@@ -1563,7 +1562,7 @@ html body {
   border-bottom: 0;
 }
 .ohyna-help-markdown th {
-  background: color-mix(in srgb, var(--mantine-color-gray-0) 88%, var(--mantine-color-blue-0));
+  background: color-mix(in srgb, var(--mantine-color-gray-0) 88%, var(--mantine-color-ohyna-0));
   font-weight: 700;
   font-size: 0.95em;
 }
@@ -1573,24 +1572,24 @@ html body {
 .ohyna-help-markdown blockquote {
   margin-left: 0;
   padding: 10px 14px;
-  border-left: 3px solid var(--mantine-color-blue-4);
+  border-left: 3px solid var(--mantine-color-ohyna-4);
   color: var(--mantine-color-gray-7);
-  background: color-mix(in srgb, var(--mantine-color-blue-0) 75%, #fff);
+  background: color-mix(in srgb, var(--mantine-color-ohyna-0) 75%, #fff);
   border-radius: 0 8px 8px 0;
 }
 .ohyna-help-markdown blockquote p {
   margin: 0.35em 0;
 }
 .ohyna-help-markdown a {
-  color: var(--mantine-color-blue-7);
+  color: var(--mantine-color-ohyna-7);
   text-decoration: underline;
-  text-decoration-color: color-mix(in srgb, var(--mantine-color-blue-4) 55%, transparent);
+  text-decoration-color: color-mix(in srgb, var(--mantine-color-ohyna-4) 55%, transparent);
   text-underline-offset: 2px;
   transition: color 120ms ease, text-decoration-color 120ms ease;
 }
 .ohyna-help-markdown a:hover {
-  color: var(--mantine-color-blue-8);
-  text-decoration-color: var(--mantine-color-blue-6);
+  color: var(--mantine-color-ohyna-8);
+  text-decoration-color: var(--mantine-color-ohyna-6);
 }
 @media (max-width: 720px) {
   .ohyna-help-modal-content {
@@ -1682,11 +1681,11 @@ html body {
 }
 
 .ohyna-msg-console__toggle:hover {
-  color: var(--mantine-color-blue-7);
+  color: var(--mantine-color-ohyna-7);
 }
 
 .ohyna-msg-console__toggle:focus-visible {
-  outline: 2px solid var(--mantine-color-blue-5);
+  outline: 2px solid var(--mantine-color-ohyna-5);
   outline-offset: -2px;
   border-radius: 4px;
 }
@@ -1740,7 +1739,7 @@ button.ohyna-msg-console__status:hover {
 }
 
 .ohyna-msg-console__status:focus-visible {
-  outline: 2px solid var(--mantine-color-blue-5);
+  outline: 2px solid var(--mantine-color-ohyna-5);
   outline-offset: 1px;
 }
 
@@ -1751,7 +1750,7 @@ button.ohyna-msg-console__status:hover {
 }
 
 .ohyna-msg-console__latest:hover {
-  color: var(--mantine-color-blue-7);
+  color: var(--mantine-color-ohyna-7);
 }
 
 .ohyna-msg-console__panel {
@@ -1785,7 +1784,7 @@ button.ohyna-msg-console__status:hover {
 .ohyna-msg-console__tab--active {
   color: var(--mantine-color-dark-7);
   background: #f6f8fa;
-  box-shadow: inset 0 -2px 0 var(--mantine-color-blue-5);
+  box-shadow: inset 0 -2px 0 var(--mantine-color-ohyna-5);
 }
 
 .ohyna-msg-console__body {
@@ -1830,7 +1829,7 @@ button.ohyna-msg-console__status:hover {
   box-shadow: none;
 }
 [data-mantine-color-scheme="dark"] .ohyna-font-option:hover {
-  border-color: var(--mantine-color-blue-5);
+  border-color: var(--mantine-color-ohyna-5);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
 }
 [data-mantine-color-scheme="dark"] .ohyna-font-option--active {
@@ -1839,8 +1838,8 @@ button.ohyna-msg-console__status:hover {
     rgba(34, 139, 230, 0.18) 0%,
     var(--mantine-color-dark-6) 72%
   );
-  border-color: var(--mantine-color-blue-5);
-  box-shadow: inset 0 0 0 1px var(--mantine-color-blue-5);
+  border-color: var(--mantine-color-ohyna-5);
+  box-shadow: inset 0 0 0 1px var(--mantine-color-ohyna-5);
 }
 [data-mantine-color-scheme="dark"] .ohyna-font-option-sample {
   background: var(--mantine-color-dark-7);
@@ -1848,7 +1847,7 @@ button.ohyna-msg-console__status:hover {
 }
 [data-mantine-color-scheme="dark"] .ohyna-font-option--active .ohyna-font-option-sample {
   background: var(--mantine-color-dark-7);
-  border-color: var(--mantine-color-blue-8);
+  border-color: var(--mantine-color-ohyna-8);
 }
 [data-mantine-color-scheme="dark"] .ohyna-font-option-sample-ja {
   color: var(--mantine-color-gray-0);
@@ -1946,7 +1945,7 @@ button.ohyna-msg-console__status:hover {
   --ohyna-help-paper: var(--mantine-color-dark-7);
   --ohyna-help-code-bg: var(--mantine-color-dark-5);
   --ohyna-help-pre-bg: #0d1117;
-  --ohyna-help-accent: var(--mantine-color-blue-4);
+  --ohyna-help-accent: var(--mantine-color-ohyna-4);
 }
 
 [data-mantine-color-scheme="dark"] .ohyna-help-modal-header {
@@ -1964,7 +1963,7 @@ button.ohyna-msg-console__status:hover {
 
 [data-mantine-color-scheme="dark"] .ohyna-help-nav-link-root[data-active] {
   background: rgba(34, 139, 230, 0.18) !important;
-  color: var(--mantine-color-blue-2) !important;
+  color: var(--mantine-color-ohyna-2) !important;
 }
 
 [data-mantine-color-scheme="dark"] .ohyna-help-main-head {
@@ -2011,15 +2010,15 @@ button.ohyna-msg-console__status:hover {
 [data-mantine-color-scheme="dark"] .ohyna-help-markdown blockquote {
   color: var(--mantine-color-gray-3);
   background: rgba(34, 139, 230, 0.12);
-  border-left-color: var(--mantine-color-blue-5);
+  border-left-color: var(--mantine-color-ohyna-5);
 }
 
 [data-mantine-color-scheme="dark"] .ohyna-help-markdown a {
-  color: var(--mantine-color-blue-4);
+  color: var(--mantine-color-ohyna-4);
 }
 
 [data-mantine-color-scheme="dark"] .ohyna-help-markdown a:hover {
-  color: var(--mantine-color-blue-3);
+  color: var(--mantine-color-ohyna-3);
 }
 
 [data-mantine-color-scheme="dark"] .ohyna-app .mantine-AppShell-footer {
@@ -2052,7 +2051,7 @@ button.ohyna-msg-console__status:hover {
 }
 
 [data-mantine-color-scheme="dark"] .ohyna-msg-console__toggle:hover {
-  color: var(--mantine-color-blue-4);
+  color: var(--mantine-color-ohyna-4);
 }
 
 [data-mantine-color-scheme="dark"] .ohyna-msg-console__status {

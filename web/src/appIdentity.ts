@@ -10,7 +10,11 @@ export const APP_DESCRIPTION =
 /** ブラウザタブ・OGP 用の短いタイトル */
 export const APP_TITLE = "Ohyna — Markdown から印刷向け PDF";
 
-export const APP_THEME_COLOR = "#0b6bcb";
+/** ブラウザ／PWA の theme-color（ひよこ本体） */
+export const APP_THEME_COLOR = "#FFB903";
+
+/** UI プライマリ（ひよこくちばし） */
+export const APP_PRIMARY_COLOR = "#FF8E01";
 
 export const APP_BACKGROUND_COLOR = "#ffffff";
 

@@ -1,3 +1,5 @@
+/** GUI 向けの表示名・アセットパス。色の正本は brandColors / appIdentity。 */
+
 export {
   APP_BACKGROUND_COLOR,
   APP_DESCRIPTION,
@@ -6,7 +8,6 @@ export {
   APP_NAME_FULL,
   APP_SCOPE,
   APP_START_URL,
-  APP_THEME_COLOR,
 } from "./appIdentity";
 
 export { APP_VERSION } from "./appVersion";

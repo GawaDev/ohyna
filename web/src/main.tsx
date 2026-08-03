@@ -6,6 +6,7 @@ import App from "./App";
 import { PopoutConsole } from "./PopoutConsole";
 import { PopoutPreview } from "./PopoutPreview";
 import { isConsolePopout } from "./consolePopoutBridge";
+import { appTheme } from "./mantineTheme";
 import { isPreviewPopout } from "./popoutBridge";
 import { initPwaUpdate } from "./pwaUpdate";
 
@@ -23,14 +24,7 @@ function Root() {
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <MantineProvider
-      defaultColorScheme="auto"
-      theme={{
-        primaryColor: "blue",
-        fontFamily: '"Noto Sans JP", "Segoe UI", sans-serif',
-        defaultRadius: "sm",
-      }}
-    >
+    <MantineProvider defaultColorScheme="auto" theme={appTheme}>
       <Notifications
         position="top-center"
         zIndex={1000}

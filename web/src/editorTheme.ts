@@ -21,6 +21,12 @@ import {
   admonitionTypeTipTag,
   admonitionTypeWarningTag,
 } from "./admonitionHighlight";
+import {
+  APP_PRIMARY_COLOR,
+  APP_THEME_COLOR,
+  OHYNA_COLORS,
+  hexRgba,
+} from "./brandColors";
 
 /** KaTeX / TeX 数式ノード用タグ */
 const katexMarkTag = Tag.define();
@@ -232,16 +238,16 @@ const mdSupport = cmMarkdown({
 
 /** Markdown / YAML / コードフェンス／KaTeX 向けの HighlightStyle（ライト） */
 const lightHighlight = HighlightStyle.define([
-  { tag: t.heading1, color: "#0550ae", fontWeight: "800" },
-  { tag: t.heading2, color: "#0969da", fontWeight: "700" },
-  { tag: t.heading3, color: "#218bff", fontWeight: "700" },
-  { tag: t.heading4, color: "#539bf5", fontWeight: "600" },
-  { tag: t.heading5, color: "#6cb6ff", fontWeight: "600" },
-  { tag: t.heading6, color: "#80bbff", fontWeight: "600" },
+  { tag: t.heading1, color: OHYNA_COLORS[9], fontWeight: "800" },
+  { tag: t.heading2, color: OHYNA_COLORS[8], fontWeight: "700" },
+  { tag: t.heading3, color: OHYNA_COLORS[7], fontWeight: "700" },
+  { tag: t.heading4, color: OHYNA_COLORS[6], fontWeight: "600" },
+  { tag: t.heading5, color: OHYNA_COLORS[5], fontWeight: "600" },
+  { tag: t.heading6, color: OHYNA_COLORS[4], fontWeight: "600" },
   { tag: t.strong, color: "#cf222e", fontWeight: "700" },
   { tag: t.emphasis, color: "#8250df", fontStyle: "italic" },
   { tag: t.strikethrough, color: "#8c959f", textDecoration: "line-through" },
-  { tag: t.link, color: "#0969da", textDecoration: "underline" },
+  { tag: t.link, color: OHYNA_COLORS[7], textDecoration: "underline" },
   { tag: t.url, color: "#0a7373" },
   {
     tag: t.monospace,
@@ -264,9 +270,9 @@ const lightHighlight = HighlightStyle.define([
   { tag: t.string, color: "#0a3069" },
   { tag: t.special(t.string), color: "#0a7373" },
   { tag: t.character, color: "#0a3069" },
-  { tag: t.number, color: "#0550ae" },
-  { tag: t.bool, color: "#0550ae", fontWeight: "600" },
-  { tag: t.null, color: "#0550ae", fontWeight: "600" },
+  { tag: t.number, color: OHYNA_COLORS[8] },
+  { tag: t.bool, color: OHYNA_COLORS[8], fontWeight: "600" },
+  { tag: t.null, color: OHYNA_COLORS[8], fontWeight: "600" },
   { tag: t.atom, color: "#8250df" },
   { tag: t.propertyName, color: "#953800" },
   { tag: t.attributeName, color: "#953800" },
@@ -276,8 +282,8 @@ const lightHighlight = HighlightStyle.define([
     color: "#953800",
     fontWeight: "600",
   },
-  { tag: t.typeName, color: "#0550ae" },
-  { tag: t.className, color: "#0550ae", fontWeight: "600" },
+  { tag: t.typeName, color: OHYNA_COLORS[8] },
+  { tag: t.className, color: OHYNA_COLORS[8], fontWeight: "600" },
   { tag: t.namespace, color: "#8250df" },
   { tag: t.operator, color: "#8250df", fontWeight: "600" },
   { tag: t.compareOperator, color: "#cf222e" },
@@ -319,7 +325,7 @@ const lightHighlight = HighlightStyle.define([
   },
   {
     tag: admonitionTypeNoteTag,
-    color: "#0550ae",
+    color: OHYNA_COLORS[8],
     fontWeight: "700",
   },
   {
@@ -351,16 +357,16 @@ const lightHighlight = HighlightStyle.define([
 
 /** ダーク UI 向け（紙面プレビューとは別） */
 const darkHighlight = HighlightStyle.define([
-  { tag: t.heading1, color: "#79c0ff", fontWeight: "800" },
-  { tag: t.heading2, color: "#79c0ff", fontWeight: "700" },
-  { tag: t.heading3, color: "#a5d6ff", fontWeight: "700" },
-  { tag: t.heading4, color: "#a5d6ff", fontWeight: "600" },
-  { tag: t.heading5, color: "#c9e4ff", fontWeight: "600" },
-  { tag: t.heading6, color: "#c9e4ff", fontWeight: "600" },
+  { tag: t.heading1, color: APP_THEME_COLOR, fontWeight: "800" },
+  { tag: t.heading2, color: APP_THEME_COLOR, fontWeight: "700" },
+  { tag: t.heading3, color: OHYNA_COLORS[3], fontWeight: "700" },
+  { tag: t.heading4, color: OHYNA_COLORS[3], fontWeight: "600" },
+  { tag: t.heading5, color: OHYNA_COLORS[2], fontWeight: "600" },
+  { tag: t.heading6, color: OHYNA_COLORS[2], fontWeight: "600" },
   { tag: t.strong, color: "#ff7b72", fontWeight: "700" },
   { tag: t.emphasis, color: "#d2a8ff", fontStyle: "italic" },
   { tag: t.strikethrough, color: "#8b949e", textDecoration: "line-through" },
-  { tag: t.link, color: "#58a6ff", textDecoration: "underline" },
+  { tag: t.link, color: OHYNA_COLORS[5], textDecoration: "underline" },
   { tag: t.url, color: "#39d0d0" },
   {
     tag: t.monospace,
@@ -383,9 +389,9 @@ const darkHighlight = HighlightStyle.define([
   { tag: t.string, color: "#a5d6ff" },
   { tag: t.special(t.string), color: "#39d0d0" },
   { tag: t.character, color: "#a5d6ff" },
-  { tag: t.number, color: "#79c0ff" },
-  { tag: t.bool, color: "#79c0ff", fontWeight: "600" },
-  { tag: t.null, color: "#79c0ff", fontWeight: "600" },
+  { tag: t.number, color: APP_THEME_COLOR },
+  { tag: t.bool, color: APP_THEME_COLOR, fontWeight: "600" },
+  { tag: t.null, color: APP_THEME_COLOR, fontWeight: "600" },
   { tag: t.atom, color: "#d2a8ff" },
   { tag: t.propertyName, color: "#ffa657" },
   { tag: t.attributeName, color: "#ffa657" },
@@ -395,8 +401,8 @@ const darkHighlight = HighlightStyle.define([
     color: "#ffa657",
     fontWeight: "600",
   },
-  { tag: t.typeName, color: "#79c0ff" },
-  { tag: t.className, color: "#79c0ff", fontWeight: "600" },
+  { tag: t.typeName, color: APP_THEME_COLOR },
+  { tag: t.className, color: APP_THEME_COLOR, fontWeight: "600" },
   { tag: t.namespace, color: "#d2a8ff" },
   { tag: t.operator, color: "#d2a8ff", fontWeight: "600" },
   { tag: t.compareOperator, color: "#ff7b72" },
@@ -438,7 +444,7 @@ const darkHighlight = HighlightStyle.define([
   },
   {
     tag: admonitionTypeNoteTag,
-    color: "#79c0ff",
+    color: APP_THEME_COLOR,
     fontWeight: "700",
   },
   {
@@ -479,18 +485,18 @@ const lightChrome = EditorView.theme({
     fontFamily: '"IBM Plex Mono", "Cascadia Code", Consolas, monospace',
     lineHeight: "1.65",
   },
-  ".cm-content": { padding: "14px 0", caretColor: "#0969da" },
+  ".cm-content": { padding: "14px 0", caretColor: APP_PRIMARY_COLOR },
   ".cm-gutters": {
     backgroundColor: "#f0f3f6",
     color: "#8c959f",
     border: "none",
   },
   ".cm-activeLineGutter": { backgroundColor: "#e7ecf1", color: "#24292f" },
-  ".cm-activeLine": { backgroundColor: "rgba(9, 105, 218, 0.06)" },
+  ".cm-activeLine": { backgroundColor: hexRgba(APP_THEME_COLOR, 0.12) },
   ".cm-selectionBackground, &.cm-focused .cm-selectionBackground": {
-    backgroundColor: "rgba(9, 105, 218, 0.18)",
+    backgroundColor: hexRgba(APP_PRIMARY_COLOR, 0.2),
   },
-  ".cm-cursor": { borderLeftColor: "#0969da" },
+  ".cm-cursor": { borderLeftColor: APP_PRIMARY_COLOR },
   ".cm-matchingBracket": {
     backgroundColor: "rgba(130, 80, 223, 0.18)",
     outline: "1px solid rgba(130, 80, 223, 0.45)",
@@ -509,18 +515,18 @@ const darkChrome = EditorView.theme(
       fontFamily: '"IBM Plex Mono", "Cascadia Code", Consolas, monospace',
       lineHeight: "1.65",
     },
-    ".cm-content": { padding: "14px 0", caretColor: "#58a6ff" },
+    ".cm-content": { padding: "14px 0", caretColor: APP_THEME_COLOR },
     ".cm-gutters": {
       backgroundColor: "#010409",
       color: "#7d8590",
       border: "none",
     },
     ".cm-activeLineGutter": { backgroundColor: "#161b22", color: "#e6edf3" },
-    ".cm-activeLine": { backgroundColor: "rgba(56, 139, 253, 0.1)" },
+    ".cm-activeLine": { backgroundColor: hexRgba(APP_THEME_COLOR, 0.1) },
     ".cm-selectionBackground, &.cm-focused .cm-selectionBackground": {
-      backgroundColor: "rgba(56, 139, 253, 0.28)",
+      backgroundColor: hexRgba(APP_PRIMARY_COLOR, 0.28),
     },
-    ".cm-cursor": { borderLeftColor: "#58a6ff" },
+    ".cm-cursor": { borderLeftColor: APP_THEME_COLOR },
     ".cm-matchingBracket": {
       backgroundColor: "rgba(210, 168, 255, 0.2)",
       outline: "1px solid rgba(210, 168, 255, 0.45)",

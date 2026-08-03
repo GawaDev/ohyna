@@ -96,7 +96,7 @@ export default defineConfig({
             sizes: "750x1334",
             type: "image/png",
             form_factor: "narrow",
-            label: "ホーム",
+            label: "狭い画面の編集",
           },
         ],
       },

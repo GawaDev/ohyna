@@ -45,7 +45,8 @@ GUI の `index.html` 内 `__OHYNA_ORIGIN__` は配信時にこのオリジンへ
 - `robots.txt` はプレビュー／PDF／解析 API を Disallow する（クロール負荷と誤用防止）
 - `llms.txt` のリンク先はヘルプカタログと一致させる
 - `/health` の `webmcp` フィールドでページ URL・カタログ・注意書きを返す
-- OGP／PWA 用画像の再生成: `python brand/render_social.py`
+- OGP 画像の再生成: `python brand/render_social.py`
+- PWA screenshots（実画面）: `python brand/capture_pwa_screenshots.py`（`ohyna serve` 起動済み）
 
 ---
 

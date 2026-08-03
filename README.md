@@ -1,6 +1,6 @@
 ﻿# Ohyna
 
-**Ohyna**（Open Hybrid Note App／おひな）は、Markdown を編集してプレビューし、PDF を保存するツールです。用紙は A4／A5／B5／Letter（既定は A4 縦）。Web GUI・HTTP API・CLI があり、1 つの Markdown から 1 つの PDF を出します。
+**Ohyna**（Open Hybrid Note App）は、Markdown を編集してプレビューし、PDF を保存するツールです。用紙は A4／A5／B5／Letter（既定は A4 縦）。Web GUI・HTTP API・CLI があり、1 つの Markdown から 1 つの PDF を出します。
 
 | | |
 |--|--|

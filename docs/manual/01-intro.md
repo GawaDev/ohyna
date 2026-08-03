@@ -1,6 +1,6 @@
 # はじめに
 
-**Ohyna**（Open Hybrid Note App／おひな）は、Ohyna Markdown の文書を PDF にするオープンソースです。ブラウザで編集し、プレビューで体裁を確かめてから PDF を保存します。
+**Ohyna**（Open Hybrid Note App）は、Ohyna Markdown の文書を PDF にするオープンソースです。ブラウザで編集し、プレビューで体裁を確かめてから PDF を保存します。
 
 ---
 

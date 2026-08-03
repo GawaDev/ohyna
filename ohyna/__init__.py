@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Ohyna（Open Hybrid Note App／おひな）— Markdown → PDF / Mermaid → SVG。
+"""Ohyna（Open Hybrid Note App）— Markdown → PDF / Mermaid → SVG。
 
 ソース: https://github.com/GawaDev/ohyna  
 デモ: https://ohyna.onrender.com/

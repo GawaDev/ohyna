@@ -24,7 +24,7 @@ MUTED_HEX = "#C96800"
 
 # appIdentity と同期
 APP_TITLE = "Ohyna"
-APP_NAME_FULL = "Open Hybrid Note App／おひな"
+APP_NAME_FULL = "Open Hybrid Note App"
 APP_TAGLINE = "Markdown を編集して、PDF にする"
 
 

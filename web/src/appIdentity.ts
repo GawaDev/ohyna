@@ -2,7 +2,7 @@
 
 export const APP_NAME = "Ohyna";
 
-export const APP_NAME_FULL = "Ohyna（Open Hybrid Note App／おひな）";
+export const APP_NAME_FULL = "Ohyna（Open Hybrid Note App）";
 
 /** meta description / PWA / OGP 共通の短い説明 */
 export const APP_DESCRIPTION =

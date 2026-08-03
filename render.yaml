@@ -1,0 +1,17 @@
+# Render Blueprint — https://dashboard.render.com/blueprints
+# Chromium 利用のためメモリは Standard（2 GB）以上を推奨。
+
+services:
+  - type: web
+    name: ohyna
+    runtime: docker
+    plan: standard
+    region: singapore
+    healthCheckPath: /health
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: OHYNA_PUBLIC_ORIGIN
+        sync: false

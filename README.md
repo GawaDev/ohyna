@@ -73,6 +73,17 @@ python -m ohyna pdf doc.md -o out.pdf
 cd web && npm install && npm run build
 ```
 
+## コンテナ / Render
+
+Docker イメージで起動できます（Chromium 同梱）。
+
+```bash
+docker build -t ohyna .
+docker run --rm -p 8787:8787 -e PORT=8787 ohyna
+```
+
+[Render](https://render.com/) ではリポジトリの `render.yaml`（Blueprint）を使います。PDF 生成のため **Standard（2 GB）以上** を推奨します。デプロイ後、`OHYNA_PUBLIC_ORIGIN` に公開 URL（例: `https://ohyna.onrender.com`）を設定してください。
+
 ## ライセンス
 
 本リポジトリのソースおよび同梱の表紙画像（`themes/covers/`）は [MIT License](./LICENSE) です。  

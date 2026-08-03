@@ -1,6 +1,6 @@
 {
   "app": "Ohyna",
-  "version": "1.0.0",
+  "version": "__OHYNA_VERSION__",
   "protocol": "WebMCP",
   "page": "/gui/",
   "repository": "https://github.com/GawaDev/ohyna",
@@ -18,7 +18,7 @@
   "notes": [
     "ツールは /gui/ を開いたタブ内で有効",
     "プレビューは体裁確認用",
-    "PDF のディスク保存は利用者の保存操作が必要"
+    "PDFを保存は利用者の保存操作で完了する"
   ],
   "tools": [
     {
@@ -53,19 +53,19 @@
     },
     {
       "name": "ohyna_refresh_preview",
-      "description": "プレビュー再取得"
+      "description": "プレビューを更新"
     },
     {
       "name": "ohyna_prepare_pdf",
-      "description": "PDF 生成と確認画面"
+      "description": "PDFを作成し確認画面を開く"
     },
     {
       "name": "ohyna_print_pdf",
-      "description": "OS 印刷ダイアログへ渡す"
+      "description": "印刷"
     },
     {
       "name": "ohyna_open_help",
-      "description": "画面内ヘルプ（任意 docId）"
+      "description": "ヘルプを開く（任意 docId）"
     }
   ]
 }

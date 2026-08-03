@@ -1,9 +1,29 @@
+:root {
+  --ohyna-sat: env(safe-area-inset-top, 0px);
+  --ohyna-sab: env(safe-area-inset-bottom, 0px);
+  --ohyna-sal: env(safe-area-inset-left, 0px);
+  --ohyna-sar: env(safe-area-inset-right, 0px);
+  --ohyna-touch-min: 44px;
+}
+
 html,
 body,
 #root {
   height: 100%;
   margin: 0;
   overflow: hidden;
+}
+
+/* 角丸・ノッチ端末でも切れないよう、可視ビューポートに合わせる */
+@supports (height: 100dvh) {
+  html {
+    height: 100dvh;
+  }
+}
+@supports (height: 100svh) {
+  html {
+    height: 100svh;
+  }
 }
 
 /*
@@ -25,14 +45,14 @@ html body {
 */
 .ohyna-notifications {
   pointer-events: none !important;
-  width: min(380px, calc(100vw - 2rem)) !important;
-  max-width: min(380px, calc(100vw - 2rem)) !important;
+  width: min(380px, calc(100vw - 2rem - var(--ohyna-sal) - var(--ohyna-sar))) !important;
+  max-width: min(380px, calc(100vw - 2rem - var(--ohyna-sal) - var(--ohyna-sar))) !important;
   background: transparent !important;
   background-color: transparent !important;
   box-shadow: none !important;
   margin: 0 !important;
   overflow: visible !important;
-  top: 0.65rem !important;
+  top: max(0.65rem, calc(var(--ohyna-sat) + 0.35rem)) !important;
 }
 .ohyna-notifications > * {
   pointer-events: none !important;
@@ -402,9 +422,37 @@ html body {
 
 .ohyna-app,
 .ohyna-app.mantine-AppShell-root {
-  height: 100dvh;
-  max-height: 100dvh;
+  height: 100%;
+  max-height: 100%;
   overflow: hidden;
+  box-sizing: border-box;
+  /* 角丸・ノッチ・ホームインジケータ分を外側で確保（中身が切れない） */
+  padding-top: var(--ohyna-sat);
+  padding-right: var(--ohyna-sar);
+  padding-bottom: var(--ohyna-sab);
+  padding-left: var(--ohyna-sal);
+  background: var(--mantine-color-body);
+}
+
+@supports (height: 100dvh) {
+  .ohyna-app,
+  .ohyna-app.mantine-AppShell-root {
+    height: 100dvh;
+    max-height: 100dvh;
+  }
+}
+
+@supports (height: 100svh) {
+  .ohyna-app,
+  .ohyna-app.mantine-AppShell-root {
+    height: 100svh;
+    max-height: 100svh;
+  }
+}
+
+.ohyna-app .mantine-AppShell-header {
+  padding-left: 0.75rem !important;
+  padding-right: 0.75rem !important;
 }
 
 /* static グリッド: ヘッダ / メイン(1fr) / フッタ */
@@ -451,6 +499,14 @@ html body {
   line-height: 1;
 }
 
+.ohyna-brand-version {
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  opacity: 0.85;
+}
+
 .ohyna-header-view {
   flex-shrink: 0;
 }
@@ -475,6 +531,9 @@ html body {
   .ohyna-brand-title {
     display: none;
   }
+  .ohyna-brand-version {
+    display: none;
+  }
   .ohyna-doc-chip {
     max-width: min(46vw, 220px);
   }
@@ -483,18 +542,154 @@ html body {
   }
 }
 
-/* タブレット: 編集／プレビューを縦並び */
+/* タブレット: 編集／プレビューを縦並び + タッチ向けサイズ */
 @media (max-width: 768px) {
   .ohyna-workspace--narrow .mantine-Splitter-pane {
     min-height: 140px !important;
   }
   .ohyna-workspace--narrow .mantine-Splitter-handle {
-    min-height: 12px;
+    min-height: 16px;
     touch-action: none;
   }
   .ohyna-pdf-modal-content {
-    max-height: 100dvh !important;
-    height: 100dvh !important;
+    max-height: 100% !important;
+    height: 100% !important;
+    padding-top: var(--ohyna-sat);
+    padding-bottom: var(--ohyna-sab);
+    padding-left: var(--ohyna-sal);
+    padding-right: var(--ohyna-sar);
+    box-sizing: border-box !important;
+  }
+
+  .ohyna-pane-head {
+    flex: 0 0 44px;
+    height: 44px;
+    min-height: 44px;
+    max-height: 44px;
+    padding-inline: 12px !important;
+  }
+
+  .ohyna-editor-toolbar {
+    min-height: var(--ohyna-touch-min);
+    padding-block: 4px;
+  }
+
+  .ohyna-app .mantine-AppShell-header .mantine-ActionIcon-root,
+  .ohyna-editor-toolbar .mantine-ActionIcon-root,
+  .ohyna-pane-head .mantine-ActionIcon-root,
+  .ohyna-msg-console__bar .mantine-ActionIcon-root,
+  .ohyna-preview-stage .mantine-ActionIcon-root,
+  .ohyna-pdf-toolbar .mantine-ActionIcon-root {
+    --ai-size: var(--ohyna-touch-min) !important;
+    min-width: var(--ohyna-touch-min) !important;
+    min-height: var(--ohyna-touch-min) !important;
+    width: var(--ohyna-touch-min) !important;
+    height: var(--ohyna-touch-min) !important;
+  }
+
+  .ohyna-pdf-toolbar {
+    padding: 6px !important;
+    gap: 4px;
+  }
+
+  .ohyna-pdf-toolbar .mantine-Text-root {
+    font-size: 13px !important;
+    min-width: 48px;
+  }
+
+  .mantine-Menu-dropdown .mantine-Menu-item {
+    min-height: var(--ohyna-touch-min);
+    font-size: 15px;
+    padding-block: 10px;
+  }
+
+  .ohyna-app .mantine-AppShell-header .mantine-Button-root,
+  .ohyna-pane-head .mantine-Button-root {
+    min-height: var(--ohyna-touch-min);
+    padding-inline: 12px;
+    font-size: 14px;
+  }
+
+  .ohyna-editor-toolbar .ohyna-editor-insert-btn {
+    min-height: var(--ohyna-touch-min);
+    padding-inline: 12px;
+    font-size: 14px;
+  }
+
+  .ohyna-mobile-pane-switch {
+    min-height: 48px;
+  }
+
+  .ohyna-mobile-pane-switch .mantine-SegmentedControl-label {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .ohyna-msg-console__bar {
+    min-height: 48px;
+  }
+
+  .ohyna-msg-console__toggle {
+    min-height: 48px;
+    padding-inline: 10px !important;
+  }
+
+  .ohyna-msg-console__status {
+    min-height: 36px;
+    padding: 6px 10px;
+    gap: 6px;
+    border-radius: 8px;
+  }
+
+  .ohyna-msg-console__status .mantine-Text-root {
+    font-size: 13px !important;
+  }
+
+  .ohyna-doc-chip {
+    min-height: 32px;
+    padding: 4px 10px 4px 8px;
+  }
+
+  .ohyna-doc-chip__name {
+    font-size: 13px !important;
+  }
+
+  .ohyna-brand-mark {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+  }
+
+  .ohyna-diag-item {
+    padding: 10px 12px;
+    border-radius: 8px;
+  }
+
+  .ohyna-settings-tabs .mantine-Tabs-tab {
+    min-height: var(--ohyna-touch-min);
+    font-size: 14px;
+    padding-inline: 14px;
+  }
+
+  .ohyna-settings-modal-content--full {
+    padding-top: var(--ohyna-sat);
+    padding-bottom: var(--ohyna-sab);
+    padding-left: var(--ohyna-sal);
+    padding-right: var(--ohyna-sar);
+    box-sizing: border-box !important;
+  }
+
+  /* iOS の入力フォーカス拡大を抑える */
+  .ohyna-editor-wrap .cm-editor {
+    font-size: 16px !important;
+  }
+
+  .ohyna-editor-wrap .cm-gutters {
+    font-size: 12px;
   }
 }
 
@@ -517,15 +712,20 @@ html body {
   }
 
   .ohyna-app .mantine-AppShell-header {
-    padding-inline: 8px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+
+  .ohyna-header-actions {
+    gap: 4px !important;
   }
 
   .ohyna-doc-chip {
-    max-width: min(38vw, 160px);
+    max-width: min(34vw, 148px);
   }
 
   .ohyna-pane-head {
-    padding-inline: 8px !important;
+    padding-inline: 10px !important;
   }
 }
 
@@ -588,6 +788,75 @@ html body {
   display: flex !important;
   flex-direction: column !important;
   box-sizing: border-box !important;
+}
+
+/* シェル（ワークスペース＋コンソール）ホスト — 角グリップの基準枠 */
+.ohyna-shell-host {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.ohyna-shell-host > .ohyna-shell-split {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* Markdown | Preview × コンソールの交点グリップ */
+.ohyna-corner-resize {
+  position: absolute;
+  z-index: 30;
+  width: 22px;
+  height: 22px;
+  margin: 0 0 -11px -11px;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  cursor: nwse-resize;
+  touch-action: none;
+  appearance: none;
+}
+
+.ohyna-corner-resize::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border-radius: 2px;
+  background: color-mix(
+    in srgb,
+    var(--mantine-color-gray-5) 55%,
+    transparent
+  );
+  box-shadow: 1px 1px 0 color-mix(in srgb, var(--mantine-color-gray-6) 40%, transparent);
+  opacity: 0.4;
+  transition: opacity 120ms ease, background 120ms ease;
+}
+
+.ohyna-corner-resize:hover::after,
+.ohyna-corner-resize:focus-visible::after,
+.ohyna-shell-host:has(.ohyna-shell-split--resizing) .ohyna-corner-resize::after {
+  opacity: 1;
+}
+
+.ohyna-corner-resize:focus-visible {
+  outline: 2px solid var(--mantine-color-blue-5);
+  outline-offset: 1px;
+}
+
+[data-mantine-color-scheme="dark"] .ohyna-corner-resize::after {
+  background: color-mix(
+    in srgb,
+    var(--mantine-color-dark-2) 65%,
+    transparent
+  );
+  box-shadow: 1px 1px 0 color-mix(in srgb, var(--mantine-color-dark-1) 45%, transparent);
 }
 
 .ohyna-shell-split.mantine-Splitter-root,
@@ -669,6 +938,36 @@ html body {
   flex: 0 0 auto;
   border-radius: 0 !important;
   border-bottom: 1px solid var(--mantine-color-gray-3);
+}
+
+.ohyna-mobile-console {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ohyna-mobile-console .ohyna-msg-console {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.ohyna-mobile-console .ohyna-msg-console__panel {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.ohyna-mobile-console .ohyna-msg-console__tabs {
+  height: 40px;
+}
+
+.ohyna-mobile-console .ohyna-msg-console__tab {
+  font-size: 13px;
+  min-height: 36px;
+  padding: 8px 12px;
+  display: inline-flex;
+  align-items: center;
 }
 
 .ohyna-pane {
@@ -966,6 +1265,7 @@ html body {
   inset: 0;
   overflow: hidden;
   background: var(--ohyna-host-desk, #cfd6de);
+  touch-action: pan-x pan-y;
 }
 
 .ohyna-html-frame-fill {
@@ -1021,16 +1321,33 @@ html body {
   --ohyna-help-accent: var(--mantine-color-blue-6);
   display: flex !important;
   flex-direction: column !important;
-  height: 100dvh !important;
-  max-height: 100dvh !important;
+  height: 100% !important;
+  max-height: 100% !important;
   overflow: hidden !important;
   border: 0;
   box-shadow: none !important;
+  padding-top: var(--ohyna-sat);
+  padding-bottom: var(--ohyna-sab);
+  padding-left: var(--ohyna-sal);
+  padding-right: var(--ohyna-sar);
+  box-sizing: border-box !important;
+}
+@supports (height: 100dvh) {
+  .ohyna-help-modal-content {
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+  }
+}
+@supports (height: 100svh) {
+  .ohyna-help-modal-content {
+    height: 100svh !important;
+    max-height: 100svh !important;
+  }
 }
 .ohyna-help-modal-header {
   flex: 0 0 auto;
   margin: 0;
-  padding: 10px 16px;
+  padding: 12px 16px;
   border-bottom: 1px solid var(--ohyna-help-line);
   background: var(--mantine-color-body);
 }
@@ -1305,10 +1622,22 @@ html body {
     max-height: min(26dvh, 168px);
   }
   .ohyna-help-article-inner {
-    padding: 12px !important;
+    padding: 14px !important;
   }
   .ohyna-help-main-head {
-    padding-inline: 12px !important;
+    padding-inline: 14px !important;
+    min-height: 48px;
+  }
+  .ohyna-help-modal-header .mantine-CloseButton-root,
+  .ohyna-help-main-head .mantine-ActionIcon-root {
+    min-width: var(--ohyna-touch-min);
+    min-height: var(--ohyna-touch-min);
+    width: var(--ohyna-touch-min);
+    height: var(--ohyna-touch-min);
+  }
+  .ohyna-help-nav .mantine-NavLink-root {
+    min-height: 44px;
+    font-size: 14px;
   }
 }
 

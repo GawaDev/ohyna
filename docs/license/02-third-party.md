@@ -2,11 +2,12 @@
 
 本ソフトウェアは次のオープンソース／公開リソースに依存します。  
 製品本体のライセンスは [MIT License](./01-mit.md) です。  
-各コンポーネントにはそれぞれのライセンスが適用されます。
+ソースコード: [https://github.com/GawaDev/ohyna](https://github.com/GawaDev/ohyna)
 
+各コンポーネントにはそれぞれのライセンスが適用されます。  
 実行時に CDN やフォントサービスへ接続する場合があります（PDF／プレビュー／内容チェック）。
 
-最終確認（2026-07-31）: Python 依存は BSD / MIT / Apache / PSF 系のみ。GUI の production 依存はほぼ MIT。例外として `argparse`（JS）が **Python-2.0**（パーミッシブ。再配布可）。**GPL / AGPL / SSPL は検出なし**。
+最終確認（2026-07-31）: Python 依存は BSD / MIT / Apache / PSF 系。GUI の production 依存はほぼ MIT。例外として `argparse`（JS）が **Python-2.0**（パーミッシブ。再配布可）。
 
 ---
 
@@ -21,7 +22,7 @@
 | PyYAML | ドキュメント設定 / YAML フェンス | MIT |
 | bleach | HTML サニタイズ | Apache-2.0 |
 
-Playwright が取得する **Chromium** バイナリは Playwright の配布条件に従います（本製品の配布物には含めません）。
+Playwright が取得する **Chromium** バイナリは Playwright の配布条件に従います。導入は `python -m playwright install chromium` です。
 
 ---
 
@@ -67,8 +68,8 @@ CDN 上の配布物そのものの著作権は各プロジェクトに帰属し�
 
 ## 5. 仕様・規格の参照について
 
-CommonMark、GFM、ISO 216、BCP 47、JSON Schema、CSS Paged Media などは、実装の根拠・互換の説明として参照しています。  
-規格文書そのものを再配布しているわけではありません。製品が契約する範囲との境界は [準拠仕様マップ](../spec/10-準拠仕様マップ.md) を参照してください。
+CommonMark、GFM、ISO 216、BCP 47、JSON Schema、CSS Paged Media などは、実装の根拠および製品契約との対応を説明する参照です。  
+製品が契約する範囲との境界は [準拠仕様マップ](../spec/10-準拠仕様マップ.md) に従います。
 
 ---
 
@@ -76,7 +77,7 @@ CommonMark、GFM、ISO 216、BCP 47、JSON Schema、CSS Paged Media などは、
 
 | 内容 | 注意 |
 |------|------|
-| 表紙背景画像 | 本製品向けに生成したオリジナル画像。第三者ストック素材ではない。ライセンスは本体と同じ MIT |
-| アプリアイコン（🐣） | Google Noto Color Emoji（U+1F423）SVG。Copyright 2013 Google LLC。画像リソースは Apache-2.0（`brand/NOTO-EMOJI-NOTICE.txt`） |
+| 表紙背景画像 | 本製品向けに生成したオリジナル画像。ライセンスは本体と同じ MIT |
+| アプリアイコン（🐣） | Google Noto Color Emoji（U+1F423）SVG。Copyright 2013 Google LLC。画像リソースは Apache-2.0 |
 | 印刷用スタイル・色テーマ | 本体と同じ MIT |
 | 画面のビルド成果 | 上記 GUI 依存のライセンスを含む |

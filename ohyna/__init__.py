@@ -26,6 +26,7 @@ from .pdf import (
     markdown_to_preview_html,
 )
 from .style import DiagramStyle, extract_init_style, list_presets
+from .version import __version__
 
 __all__ = [
     "DiagramStyle",
@@ -43,6 +44,5 @@ __all__ = [
     "parse_document",
     "parse_frontmatter",
     "render_flowchart_svg",
+    "__version__",
 ]
-
-__version__ = "1.0.0"

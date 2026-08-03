@@ -1,6 +1,7 @@
-# 11. サイトメタと WebMCP
+﻿# 11. サイトメタと WebMCP
 
-版: **1.0.0**  
+版: **1.0.0**（正本 `VERSION`）  
+
 対象: 開発・運用（画面ヘルプには出さない）
 
 | | |
@@ -59,7 +60,7 @@ GUI の `index.html` 内 `__OHYNA_ORIGIN__` は配信時にこのオリジンへ
 - API（実装差あり）:
   - 先行実装・チュートリアル: `navigator.modelContext.registerTool({ name, description, inputSchema, execute })`
   - 現行ドラフト／Chrome ドキュメント: `document.modelContext.registerTool(..., { signal })`
-- Ohyna は **navigator → document** の順で `registerTool` を探す。第2引数 `{ signal }` 非対応実装ではツール定義のみで再試行する
+- Ohyna は **navigator → document** の順で `registerTool` を探す。第2引数 `{ signal }` がある実装ではそれを使い、無い実装ではツール定義のみで登録する
 
 ### 2.2 Ohyna の実装
 
@@ -75,17 +76,17 @@ GUI の `index.html` 内 `__OHYNA_ORIGIN__` は配信時にこのオリジンへ
 | `ohyna_get_document_settings` | `ohyna:` 設定の要約 | `readOnlyHint` |
 | `ohyna_analyze` | `/analyze` 相当の検査 | `readOnlyHint` |
 | `ohyna_refresh_preview` | プレビュー再取得 | |
-| `ohyna_prepare_pdf` | PDF 生成＋確認 UI | ディスク保存はユーザ操作 |
-| `ohyna_print_pdf` | OS 印刷ダイアログへ | 未生成なら生成してから |
+| `ohyna_prepare_pdf` | PDFを作成＋確認 UI | ディスク保存は利用者の保存操作 |
+| `ohyna_print_pdf` | OS 印刷ダイアログへ | 未作成なら作成してから |
 | `ohyna_open_help` | ヘルプを開く（任意 `docId`） | |
 
-制約:
+動作条件:
 
-- `navigator` / `document` いずれにも `modelContext.registerTool` が無いブラウザでは登録しない（GUI は通常どおり動作）
+- `navigator` / `document` いずれかに `modelContext.registerTool` があるブラウザで登録する
 - Permissions Policy の `tools`（既定 `'self'`）。`index.html` に `Permissions-Policy: tools=(self)` を明示
 - セキュアコンテキスト（HTTPS／localhost）が前提になりやすい
-- PDF のファイル保存・ファイルピッカーは OS UI のためエージェント完結にしない
-- プレビューは見た目確認のみ（リンクジャンプ不可）
+- PDF のファイル保存・ファイルピッカーは OS UI で完了する
+- プレビューは体裁確認用（ズーム・スクロール可）
 
 ### 2.3 フラグ
 
@@ -99,4 +100,4 @@ GUI の `index.html` 内 `__OHYNA_ORIGIN__` は配信時にこのオリジンへ
 | 寿命 | 常駐 | タブを閉じると消える |
 | 用途 | どこからでもデータ・操作 | **開いているサイト上**での操作 |
 
-置き換え関係ではない。バックエンド MCP とページ上の WebMCP を併用できる。サーバ常駐の MCP トランスポートは提供しない。
+バックエンド MCP とページ上の WebMCP を併用できます。本製品の WebMCP はタブ内登録です。

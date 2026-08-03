@@ -13,6 +13,7 @@ build/
 # Node / ビルド
 web/node_modules/
 web/dist/
+*.tsbuildinfo
 
 # 秘密情報・ローカル設定
 .env
@@ -35,9 +36,10 @@ _ui_*.png
 _ui_*.json
 *.pdf
 
-# OS / エディタ
+# OS / エディタ / ローカル AI 設定
 .DS_Store
 Thumbs.db
 *.swp
 .idea/
 .vscode/
+.cursor/

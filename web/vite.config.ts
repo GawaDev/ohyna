@@ -1,3 +1,6 @@
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
@@ -11,7 +14,17 @@ import {
   APP_THEME_COLOR,
 } from "./src/appIdentity";
 
+const rootDir = join(dirname(fileURLToPath(import.meta.url)), "..");
+const appVersion =
+  readFileSync(join(rootDir, "VERSION"), "utf-8")
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .find((line) => line && !line.startsWith("#")) ?? "0.0.0";
+
 export default defineConfig({
+  define: {
+    __OHYNA_VERSION__: JSON.stringify(appVersion),
+  },
   plugins: [
     react(),
     VitePWA({

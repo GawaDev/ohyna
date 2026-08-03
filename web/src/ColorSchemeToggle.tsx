@@ -12,7 +12,12 @@ const OPTIONS = [
   { value: "auto" as const, label: "システムに合わせる", icon: IconDeviceDesktop },
 ];
 
-export function ColorSchemeToggle() {
+type Props = {
+  size?: "sm" | "md" | "lg";
+  iconSize?: number;
+};
+
+export function ColorSchemeToggle({ size = "sm", iconSize = 16 }: Props) {
   const { colorScheme, setColorScheme } = useMantineColorScheme();
   const ActiveIcon =
     colorScheme === "dark"
@@ -28,10 +33,10 @@ export function ColorSchemeToggle() {
           <ActionIcon
             variant="subtle"
             color="gray"
-            size="sm"
+            size={size}
             aria-label="表示の明るさ"
           >
-            <ActiveIcon size={16} stroke={1.5} />
+            <ActiveIcon size={iconSize} stroke={1.5} />
           </ActionIcon>
         </Tooltip>
       </Menu.Target>

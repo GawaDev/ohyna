@@ -71,7 +71,7 @@ import {
   validateDocumentSettings,
   type DocumentSettings,
 } from "./frontmatter";
-import { APP_MARK_SRC, APP_NAME, APP_NAME_FULL } from "./brand";
+import { APP_MARK_SRC, APP_NAME, APP_NAME_FULL, APP_VERSION } from "./brand";
 import { tryRegisterWebMcpTools } from "./webmcp";
 import { HtmlPreview } from "./HtmlPreview";
 import {
@@ -81,8 +81,13 @@ import {
 import {
   MessageConsole,
   MESSAGE_CONSOLE_COLLAPSED,
+  MESSAGE_CONSOLE_COLLAPSED_TOUCH,
   MESSAGE_CONSOLE_EXPANDED,
 } from "./MessageConsole";
+import {
+  CornerResizeHandle,
+  type CornerResizeDelta,
+} from "./CornerResizeHandle";
 import { formatDiagItem, formatDiagSummary } from "./diagFormat";
 import {
   ANALYSIS_CONSOLE_ID,
@@ -189,7 +194,20 @@ export default function App() {
   const isNarrow = useMediaQuery("(max-width: 768px)");
   /** スマホ相当: 編集／プレビューを切替表示 */
   const isPhone = useMediaQuery("(max-width: 560px)");
-  const [mobilePane, setMobilePane] = useState<"edit" | "preview">("edit");
+  /** タッチ向け: ヘッダ／コンソール／ボタンを大きくする */
+  const touchUi = !!isNarrow;
+  const consoleCollapsed = touchUi
+    ? MESSAGE_CONSOLE_COLLAPSED_TOUCH
+    : MESSAGE_CONSOLE_COLLAPSED;
+  const headerHeight = isPhone ? 52 : touchUi ? 48 : 40;
+  const chromeIconSize = touchUi ? "lg" : "sm";
+  const chromeIconPx = touchUi ? 20 : 16;
+  const chromeBtnSize = touchUi ? "sm" : "compact-xs";
+  const brandMarkPx = touchUi ? 28 : 22;
+  const [mobilePane, setMobilePane] = useState<"edit" | "preview" | "console">(
+    "edit"
+  );
+  const isPhoneRef = useRef(false);
   const editorExtensions = useMemo(
     () => getEditorExtensions(computedColorScheme),
     [computedColorScheme]
@@ -228,7 +246,12 @@ export default function App() {
   const mdDiagnosticsRef = useRef(mdDiagnostics);
   mdDiagnosticsRef.current = mdDiagnostics;
   const analysisHasErrors = mdDiagnostics.some((d) => d.severity === "error");
+  const analysisErrorCount = mdDiagnostics.filter(
+    (d) => d.severity === "error"
+  ).length;
+  isPhoneRef.current = !!isPhone;
   const jumpToProblem = useCallback((line: number) => {
+    if (isPhoneRef.current) setMobilePane("edit");
     jumpToDiagnosticLine(editorViewRef.current, line);
   }, []);
   const [busy, setBusy] = useState(false);
@@ -305,9 +328,70 @@ export default function App() {
     100,
     `${MESSAGE_CONSOLE_COLLAPSED}px`,
   ]);
+  const consoleCollapsedRef = useRef(consoleCollapsed);
+  consoleCollapsedRef.current = consoleCollapsed;
   const [shellResizing, setShellResizing] = useState(false);
+  const [workspaceSizes, setWorkspaceSizes] = useState<SplitterPaneSize[]>([
+    50, 50,
+  ]);
+  const [cornerResizing, setCornerResizing] = useState(false);
+
+  const workspaceLeftPercent = (() => {
+    const left = workspaceSizes[0];
+    if (typeof left === "number") return left;
+    if (typeof left === "string" && left.endsWith("%")) return parseFloat(left);
+    return 50;
+  })();
+
+  const consoleHeightPx = (() => {
+    const bottom = shellSizes[1];
+    if (typeof bottom === "string" && bottom.endsWith("px")) {
+      return parseFloat(bottom);
+    }
+    return consoleCollapsed;
+  })();
+
+  useEffect(() => {
+    if (consoleOpen) return;
+    setShellSizes([100, `${consoleCollapsed}px`]);
+  }, [consoleCollapsed, consoleOpen]);
+
+  const onCornerResize = useCallback((delta: CornerResizeDelta) => {
+    const left =
+      Math.round(Math.min(78, Math.max(22, delta.xRatio * 100)) * 10) / 10;
+    setWorkspaceSizes([left, 100 - left]);
+    const minH = consoleCollapsedRef.current;
+    const h = Math.max(minH, Math.round(delta.consoleHeightPx));
+    setShellSizes([100, `${h}px`]);
+    setConsoleOpen(h > minH + 8);
+  }, []);
+
+  const onCornerResizeStart = useCallback(() => {
+    setCornerResizing(true);
+    setSplitterResizing(true);
+    setShellResizing(true);
+  }, []);
+
+  const onCornerResizeEnd = useCallback(() => {
+    setCornerResizing(false);
+    setSplitterResizing(false);
+    setShellResizing(false);
+    setPreviewLayoutTick((n) => n + 1);
+  }, []);
+
+  const onCornerReset = useCallback(() => {
+    setWorkspaceSizes([50, 50]);
+    setShellSizes([100, `${MESSAGE_CONSOLE_EXPANDED}px`]);
+    setConsoleOpen(true);
+    setPreviewLayoutTick((n) => n + 1);
+  }, []);
 
   const openConsolePane = useCallback(() => {
+    if (isPhoneRef.current) {
+      setMobilePane("console");
+      setConsoleOpen(true);
+      return;
+    }
     setConsoleOpen(true);
     setShellSizes([100, `${MESSAGE_CONSOLE_EXPANDED}px`]);
   }, []);
@@ -318,7 +402,7 @@ export default function App() {
       setShellSizes(
         next
           ? [100, `${MESSAGE_CONSOLE_EXPANDED}px`]
-          : [100, `${MESSAGE_CONSOLE_COLLAPSED}px`]
+          : [100, `${consoleCollapsedRef.current}px`]
       );
       return next;
     });
@@ -1698,39 +1782,47 @@ export default function App() {
     <AppShell
       className={dirty ? "ohyna-app ohyna-app--dirty" : "ohyna-app"}
       mode="static"
-      header={{ height: 40 }}
+      header={{ height: headerHeight }}
       footer={
-        consolePopped ? { height: MESSAGE_CONSOLE_COLLAPSED } : undefined
+        consolePopped ? { height: consoleCollapsed } : undefined
       }
       padding={0}
       onDragOver={onAppDragOver}
       onDrop={(e) => void onAppDrop(e)}
     >
       <AppShell.Header px="sm" className="ohyna-app-header">
-        <Group h="100%" justify="space-between" wrap="nowrap" gap="sm">
-          <Group gap={8} wrap="nowrap" style={{ minWidth: 0 }}>
-            <Tooltip label={APP_NAME_FULL} withArrow>
+        <Group h="100%" justify="space-between" wrap="nowrap" gap={touchUi ? "xs" : "sm"}>
+          <Group gap={touchUi ? 6 : 8} wrap="nowrap" style={{ minWidth: 0 }}>
+            <Tooltip label={`${APP_NAME_FULL} ${APP_VERSION}`} withArrow>
               <a
                 className="ohyna-brand"
                 href="/"
-                aria-label={APP_NAME_FULL}
+                aria-label={`${APP_NAME_FULL} ${APP_VERSION}`}
                 onClick={(e) => e.preventDefault()}
               >
                 <img
                   className="ohyna-brand-mark"
                   src={APP_MARK_SRC}
-                  width={22}
-                  height={22}
+                  width={brandMarkPx}
+                  height={brandMarkPx}
                   alt=""
                   aria-hidden
                 />
                 <Text
-                  size="sm"
+                  size={touchUi ? "md" : "sm"}
                   fw={700}
                   className="ohyna-brand-title"
                   component="span"
                 >
                   {APP_NAME}
+                </Text>
+                <Text
+                  size="xs"
+                  c="dimmed"
+                  className="ohyna-brand-version"
+                  component="span"
+                >
+                  {APP_VERSION}
                 </Text>
               </a>
             </Tooltip>
@@ -1775,44 +1867,44 @@ export default function App() {
             {restoreHandle ? (
               <Group gap={6} wrap="nowrap" style={{ flexShrink: 0 }}>
                 <Button
-                  size="compact-xs"
+                  size={chromeBtnSize}
                   color="blue"
                   loading={restoreBusy}
                   onClick={() => void restorePreviousFile()}
                 >
-                  前回のファイルを開く
+                  {isPhone ? "前回を開く" : "前回のファイルを開く"}
                 </Button>
                 <Tooltip label="復元しない" withArrow>
                   <ActionIcon
-                    size="sm"
+                    size={chromeIconSize}
                     variant="subtle"
                     color="gray"
                     aria-label="前回のファイルを復元しない"
                     disabled={restoreBusy}
                     onClick={dismissRestorePrevious}
                   >
-                    <IconX size={14} stroke={1.5} />
+                    <IconX size={chromeIconPx - 2} stroke={1.5} />
                   </ActionIcon>
                 </Tooltip>
               </Group>
             ) : null}
           </Group>
 
-          <Group gap={6} wrap="nowrap" className="ohyna-header-actions">
+          <Group gap={touchUi ? 4 : 6} wrap="nowrap" className="ohyna-header-actions">
             <Group gap={2} wrap="nowrap" className="ohyna-header-view">
-              <ColorSchemeToggle />
+              <ColorSchemeToggle size={chromeIconSize} iconSize={chromeIconPx} />
               <Tooltip label="ヘルプ" withArrow>
                 <ActionIcon
                   variant="subtle"
                   color="gray"
-                  size="sm"
+                  size={chromeIconSize}
                   aria-label="ヘルプ"
                   onClick={() => {
                     setHelpDocId(undefined);
                     helpHandlers.open();
                   }}
                 >
-                  <IconHelp size={16} stroke={1.5} />
+                  <IconHelp size={chromeIconPx} stroke={1.5} />
                 </ActionIcon>
               </Tooltip>
             </Group>
@@ -1834,12 +1926,12 @@ export default function App() {
                       <ActionIcon
                         variant={dirty ? "light" : "default"}
                         color={dirty ? "orange" : undefined}
-                        size="sm"
+                        size={chromeIconSize}
                         aria-label={
                           dirty ? "ファイルメニュー（未保存）" : "ファイルメニュー"
                         }
                       >
-                        <IconFolderOpen size={16} stroke={1.5} />
+                        <IconFolderOpen size={chromeIconPx} stroke={1.5} />
                       </ActionIcon>
                     </Tooltip>
                   </Menu.Target>
@@ -1931,12 +2023,12 @@ export default function App() {
                 >
                   <ActionIcon
                     variant="default"
-                    size="sm"
+                    size={chromeIconSize}
                     aria-label="プレビューを更新"
                     disabled={busy || analyzePending || analysisHasErrors}
                     onClick={() => void forceRefreshPreview()}
                   >
-                    <IconRefresh size={16} stroke={1.5} />
+                    <IconRefresh size={chromeIconPx} stroke={1.5} />
                   </ActionIcon>
                 </Tooltip>
               </ActionIcon.Group>
@@ -1953,8 +2045,10 @@ export default function App() {
               withArrow
             >
               <Button
-                size="compact-xs"
-                leftSection={<IconFileTypePdf size={14} stroke={1.5} />}
+                size={chromeBtnSize}
+                leftSection={
+                  <IconFileTypePdf size={touchUi ? 18 : 14} stroke={1.5} />
+                }
                 disabled={pdfBusy || analysisHasErrors || analyzePending}
                 loading={pdfBusy}
                 onClick={() => void generatePdf()}
@@ -1987,38 +2081,40 @@ export default function App() {
               wrap="nowrap"
               gap="xs"
             >
-              <Text size="xs" fw={700} c="dimmed" lh={1}>
+              <Text size={touchUi ? "sm" : "xs"} fw={700} c="dimmed" lh={1}>
                 Markdown
               </Text>
               <Group gap={6} wrap="nowrap">
                 <Button
-                  size="compact-xs"
+                  size={chromeBtnSize}
                   variant={settingsMissing ? "filled" : "subtle"}
                   color={settingsMissing ? "orange" : "gray"}
-                  leftSection={<IconSettings size={14} stroke={1.5} />}
+                  leftSection={
+                    <IconSettings size={touchUi ? 16 : 14} stroke={1.5} />
+                  }
                   onClick={openSettingsEdit}
                 >
                   {settingsMissing ? "ドキュメント設定が必要" : "ドキュメント設定"}
                 </Button>
                 <Tooltip label="プレビューを前面へ">
                   <ActionIcon
-                    size="sm"
+                    size={chromeIconSize}
                     variant="light"
                     color="blue"
                     aria-label="プレビューを前面へ"
                     onClick={focusPreviewWindow}
                   >
-                    <IconWindowMaximize size={14} stroke={1.5} />
+                    <IconWindowMaximize size={chromeIconPx - 2} stroke={1.5} />
                   </ActionIcon>
                 </Tooltip>
                 <Tooltip label="プレビューを戻す">
                   <ActionIcon
-                    size="sm"
+                    size={chromeIconSize}
                     variant="default"
                     aria-label="プレビューを戻す"
                     onClick={dockPreviewWindow}
                   >
-                    <IconArrowBackUp size={14} stroke={1.5} />
+                    <IconArrowBackUp size={chromeIconPx - 2} stroke={1.5} />
                   </ActionIcon>
                 </Tooltip>
               </Group>
@@ -2039,29 +2135,76 @@ export default function App() {
             {isPhone ? (
               <SegmentedControl
                 className="ohyna-mobile-pane-switch"
-                size="xs"
+                size="md"
                 fullWidth
                 value={mobilePane}
-                onChange={(v) => setMobilePane(v as "edit" | "preview")}
+                onChange={(v) =>
+                  setMobilePane(v as "edit" | "preview" | "console")
+                }
                 data={[
                   { label: "編集", value: "edit" },
                   { label: "プレビュー", value: "preview" },
+                  {
+                    value: "console",
+                    label:
+                      analysisErrorCount > 0 ? (
+                        <Group gap={6} wrap="nowrap" justify="center">
+                          <span>コンソール</span>
+                          <Badge size="xs" color="red" variant="filled">
+                            {analysisErrorCount}
+                          </Badge>
+                        </Group>
+                      ) : (
+                        "コンソール"
+                      ),
+                  },
                 ]}
-                aria-label="編集とプレビューの切替"
+                aria-label="編集・プレビュー・コンソールの切替"
               />
             ) : null}
+            {isPhone && mobilePane === "console" ? (
+              <Box className="ohyna-mobile-console" mih={0}>
+                <MessageConsole
+                  fill
+                  expanded
+                  windowMode
+                  analysis={{
+                    pending: analyzePending && serverDiagnostics == null,
+                    diagnostics: mdDiagnostics,
+                  }}
+                  preview={{
+                    state: previewState,
+                    message: errorMessage,
+                    diagramErrorCount,
+                    diagramErrorHint,
+                    analyzePending:
+                      analyzePending &&
+                      (analyzeGate == null ||
+                        analyzeGate.source !== debouncedMarkdown),
+                  }}
+                  onJumpLine={jumpToProblem}
+                  onPopOut={openConsoleWindow}
+                />
+              </Box>
+            ) : (
           <Splitter
             className={[
               "ohyna-workspace",
-              splitterResizing ? "ohyna-workspace--resizing" : "",
+              splitterResizing || cornerResizing
+                ? "ohyna-workspace--resizing"
+                : "",
               isNarrow ? "ohyna-workspace--narrow" : "",
-              isPhone ? `ohyna-workspace--mobile-pane-${mobilePane}` : "",
+              isPhone && mobilePane !== "console"
+                ? `ohyna-workspace--mobile-pane-${mobilePane}`
+                : "",
             ]
               .filter(Boolean)
               .join(" ")}
             orientation={isNarrow ? "vertical" : "horizontal"}
             h="100%"
             mah="100%"
+            sizes={workspaceSizes}
+            onSizeChange={setWorkspaceSizes}
             resetOnDoubleClick
             lineSize={1}
             handleColor={
@@ -2086,15 +2229,17 @@ export default function App() {
                   wrap="nowrap"
                   gap="xs"
                 >
-                  <Text size="xs" fw={700} c="dimmed" lh={1}>
+                  <Text size={touchUi ? "sm" : "xs"} fw={700} c="dimmed" lh={1}>
                     Markdown
                   </Text>
                   <Group gap={6} wrap="nowrap">
                     <Button
-                      size="compact-xs"
+                      size={chromeBtnSize}
                       variant={settingsMissing ? "filled" : "subtle"}
                       color={settingsMissing ? "orange" : "gray"}
-                      leftSection={<IconSettings size={14} stroke={1.5} />}
+                      leftSection={
+                        <IconSettings size={touchUi ? 16 : 14} stroke={1.5} />
+                      }
                       onClick={openSettingsEdit}
                     >
                       {isPhone
@@ -2133,19 +2278,19 @@ export default function App() {
                   wrap="nowrap"
                   gap="xs"
                 >
-                  <Text size="xs" fw={700} c="dimmed" lh={1}>
+                  <Text size={touchUi ? "sm" : "xs"} fw={700} c="dimmed" lh={1}>
                     プレビュー
                   </Text>
                   <Group gap={6} wrap="nowrap">
                     <Tooltip label="別ウィンドウで表示">
                       <ActionIcon
-                        size="sm"
+                        size={chromeIconSize}
                         variant="subtle"
                         color="gray"
                         aria-label="別ウィンドウで表示"
                         onClick={openPreviewWindow}
                       >
-                        <IconWindowMaximize size={14} stroke={1.5} />
+                        <IconWindowMaximize size={chromeIconPx - 2} stroke={1.5} />
                       </ActionIcon>
                     </Tooltip>
                   </Group>
@@ -2183,7 +2328,7 @@ export default function App() {
                         </Text>
                         <Text size="xs" c="dimmed" ta="center">
                           {errorMessage ||
-                            "下部のコンソールから「問題」または「出力」を確認してください。"}
+                            "コンソールの「問題」または「出力」を確認してください。"}
                         </Text>
                       </Stack>
                     </Center>
@@ -2224,71 +2369,86 @@ export default function App() {
               </Box>
             </Splitter.Pane>
           </Splitter>
+            )}
           </Box>
             );
-            if (consolePopped) return workspace;
+            if (consolePopped || isPhone) return workspace;
+            const showCorner =
+              !isNarrow && !isPhone && !previewPopped;
             return (
-              <Splitter
-                className={
-                  shellResizing
-                    ? "ohyna-shell-split ohyna-shell-split--resizing"
-                    : "ohyna-shell-split"
-                }
-                orientation="vertical"
-                h="100%"
-                mah="100%"
-                sizes={shellSizes}
-                onSizeChange={(sizes) => {
-                  setShellSizes(sizes);
-                  const bottom = sizes[1];
-                  if (typeof bottom === "string" && bottom.endsWith("px")) {
-                    setConsoleOpen(parseFloat(bottom) > 48);
-                  } else if (typeof bottom === "number") {
-                    setConsoleOpen(bottom > 6);
+              <Box className="ohyna-shell-host" h="100%" mih={0}>
+                <Splitter
+                  className={
+                    shellResizing || cornerResizing
+                      ? "ohyna-shell-split ohyna-shell-split--resizing"
+                      : "ohyna-shell-split"
                   }
-                }}
-                onResizeStart={() => setShellResizing(true)}
-                onResizeEnd={() => {
-                  setShellResizing(false);
-                  setPreviewLayoutTick((n) => n + 1);
-                }}
-                resetOnDoubleClick
-                lineSize={1}
-                handleColor={
-                  computedColorScheme === "dark" ? "dark.4" : "gray.4"
-                }
-              >
-                <Splitter.Pane defaultSize={100} min={20}>
-                  {workspace}
-                </Splitter.Pane>
-                <Splitter.Pane
-                  defaultSize={`${MESSAGE_CONSOLE_COLLAPSED}px`}
-                  min={`${MESSAGE_CONSOLE_COLLAPSED}px`}
-                  max="70%"
+                  orientation="vertical"
+                  h="100%"
+                  mah="100%"
+                  sizes={shellSizes}
+                  onSizeChange={(sizes) => {
+                    setShellSizes(sizes);
+                    const bottom = sizes[1];
+                    if (typeof bottom === "string" && bottom.endsWith("px")) {
+                      setConsoleOpen(parseFloat(bottom) > 48);
+                    } else if (typeof bottom === "number") {
+                      setConsoleOpen(bottom > 6);
+                    }
+                  }}
+                  onResizeStart={() => setShellResizing(true)}
+                  onResizeEnd={() => {
+                    setShellResizing(false);
+                    setPreviewLayoutTick((n) => n + 1);
+                  }}
+                  resetOnDoubleClick
+                  lineSize={1}
+                  handleColor={
+                    computedColorScheme === "dark" ? "dark.4" : "gray.4"
+                  }
                 >
-                  <MessageConsole
-                    fill
-                    expanded={consoleOpen}
-                    onToggle={toggleConsolePane}
-                    analysis={{
-                      pending: analyzePending && serverDiagnostics == null,
-                      diagnostics: mdDiagnostics,
-                    }}
-                    preview={{
-                      state: previewState,
-                      message: errorMessage,
-                      diagramErrorCount,
-                      diagramErrorHint,
-                      analyzePending:
-                        analyzePending &&
-                        (analyzeGate == null ||
-                          analyzeGate.source !== debouncedMarkdown),
-                    }}
-                    onJumpLine={jumpToProblem}
-                    onPopOut={openConsoleWindow}
+                  <Splitter.Pane defaultSize={100} min={20}>
+                    {workspace}
+                  </Splitter.Pane>
+                  <Splitter.Pane
+                    defaultSize={`${consoleCollapsed}px`}
+                    min={`${consoleCollapsed}px`}
+                    max="70%"
+                  >
+                    <MessageConsole
+                      fill
+                      expanded={consoleOpen}
+                      onToggle={toggleConsolePane}
+                      analysis={{
+                        pending: analyzePending && serverDiagnostics == null,
+                        diagnostics: mdDiagnostics,
+                      }}
+                      preview={{
+                        state: previewState,
+                        message: errorMessage,
+                        diagramErrorCount,
+                        diagramErrorHint,
+                        analyzePending:
+                          analyzePending &&
+                          (analyzeGate == null ||
+                            analyzeGate.source !== debouncedMarkdown),
+                      }}
+                      onJumpLine={jumpToProblem}
+                      onPopOut={openConsoleWindow}
+                    />
+                  </Splitter.Pane>
+                </Splitter>
+                {showCorner ? (
+                  <CornerResizeHandle
+                    leftPercent={workspaceLeftPercent}
+                    consoleHeightPx={consoleHeightPx}
+                    onResizeStart={onCornerResizeStart}
+                    onResize={onCornerResize}
+                    onResizeEnd={onCornerResizeEnd}
+                    onReset={onCornerReset}
                   />
-                </Splitter.Pane>
-              </Splitter>
+                ) : null}
+              </Box>
             );
           })()
         )}

@@ -23,6 +23,7 @@ import "react-pdf/dist/Page/TextLayer.css";
 import { modScrollLabel } from "./platform";
 import { useCtrlWheelZoom } from "./useCtrlWheelZoom";
 import { useMiddleClickPan } from "./useMiddleClickPan";
+import { usePinchZoom } from "./usePinchZoom";
 
 /**
  * PDF 確認ビューア。
@@ -213,6 +214,11 @@ export function PdfPreview({ url }: Props) {
     [captureZoomAnchor]
   );
 
+  const zoomByFactor = useCallback((factor: number) => {
+    if (!Number.isFinite(factor) || factor <= 0) return;
+    setZoom((z) => clampZoom(z * factor));
+  }, []);
+
   const zoomByButton = useCallback(
     (dir: 1 | -1) => {
       captureZoomAnchor();
@@ -282,6 +288,13 @@ export function PdfPreview({ url }: Props) {
     enabled: Boolean(url),
     resetKey: url,
     onZoom: zoomByWheel,
+  });
+
+  usePinchZoom(rootRef, {
+    enabled: Boolean(url),
+    resetKey: url,
+    onPinchStart: captureZoomAnchor,
+    onZoomFactor: zoomByFactor,
   });
 
   useMiddleClickPan(wrapRef, {

@@ -9,6 +9,8 @@ export {
   APP_THEME_COLOR,
 } from "./appIdentity";
 
+export { APP_VERSION } from "./appVersion";
+
 /** 静的アセット（Vite base `/gui/` 配下） */
 export const APP_MARK_SRC = `${import.meta.env.BASE_URL}ohyna-mark.svg`;
 export const APP_ICON_192 = `${import.meta.env.BASE_URL}pwa-192.png`;

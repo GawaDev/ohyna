@@ -1062,6 +1062,8 @@ kbd {
     background: var(--ohyna-desk) !important;
     overflow: auto;
     overscroll-behavior: contain;
+    /* スクロールは許可し、ページ全体のピンチズームはアプリ側で処理 */
+    touch-action: pan-x pan-y;
   }
 
   /* 左右 padding は HtmlPreview の SIDE_GUTTER_PX(32) と一致 */

@@ -1,4 +1,4 @@
-# 04. API と CLI
+﻿# 04. API と CLI
 
 HTTP サーバは `python -m ohyna serve` で起動します。開発時の既定は `127.0.0.1:8787`。  
 本番はリバースプロキシ配下で公開します（[06-セキュリティ.md](./06-セキュリティ.md)）。  
@@ -12,13 +12,14 @@ HTTP サーバは `python -m ohyna serve` で起動します。開発時の既�
 
 ### CORS
 
-- `Origin` ヘッダが無い通常の同一オリジン取得: CORS ヘッダなし
-- 許可する Origin:
-  - リクエストの Host と一致する `http` / `https`
-  - 開発用 `127.0.0.1` / `localhost` のポート `8787` と `5173`（Vite）
-  - 環境変数 `OHYNA_ALLOWED_ORIGINS`（カンマ区切り）に列挙した Origin
-- それ以外: CORS を付けない。`OPTIONS` は `403`
-- `Access-Control-Allow-Origin: *` は使わない
+CORS ヘッダは、次のいずれかに一致する `Origin` に付与します。
+
+- リクエストの Host と一致する `http` / `https`
+- 開発用 `127.0.0.1` / `localhost` のポート `8787` と `5173`（Vite）
+- 環境変数 `OHYNA_ALLOWED_ORIGINS`（カンマ区切り）に列挙した Origin
+
+`Origin` ヘッダが無い通常の同一オリジン取得では CORS ヘッダを付けません。  
+許可一覧外の Origin では CORS ヘッダを付けず、`OPTIONS` は `403` です。
 
 ### エラー JSON
 
@@ -41,7 +42,7 @@ HTTP サーバは `python -m ohyna serve` で起動します。開発時の既�
 
 ## 3. POST `/analyze`
 
-Markdown の静的解析。プレビュー／PDF は生成しません。
+Markdown の静的解析。静的解析結果（診断一覧）のみを返します。
 
 ### 検査項目
 
@@ -123,7 +124,7 @@ warning のみなら通過します。
 
 生成例外は `400` です。
 
-GUI は文書設定未完了のときこの API を呼びません。HTTP を直接叩く場合も解析ゲートは常に掛かります。
+GUI は文書設定が揃っているときこの API を呼びます。HTTP を直接叩く場合も解析ゲートは常に掛かります。
 
 ---
 
@@ -158,9 +159,7 @@ python -m ohyna [--list-styles] <command> ...
 | 出力 | `-o` に `.pdf` パス |
 | 表紙 | `--no-cover` 以外。FM の `cover` を尊重（未指定は表紙あり） |
 | 上書き | `--title` / `--subtitle` / `--part-label` / `-s` / `--theme-css` / `--work-dir` |
-| 静的解析ゲート | **なし**（HTTP `/pdf` とは異なる） |
-
-CLI はバッチ・自動処理用途を想定するため解析ゲートを設けません。品質ゲートが必要なときは利用者が HTTP `/analyze` を先に実行します。
+| 静的解析 | CLI はバッチ用途のためゲート無し。品質ゲートが必要なときは先に HTTP `/analyze` |
 
 各サブコマンドの引数は `-h` を参照してください。
 

@@ -1,6 +1,11 @@
 # MIT License
 
-本製品（ソースおよび同梱の表紙画像など）のライセンスは **MIT License** です。条文は次のとおりです。
+本製品（ソースおよび同梱の表紙画像など）のライセンスは **MIT License** です。
+
+- ソースコード: [https://github.com/GawaDev/ohyna](https://github.com/GawaDev/ohyna)
+- 第三者コンポーネント: [02-third-party.md](./02-third-party.md)
+
+条文は次のとおりです。
 
 ---
 

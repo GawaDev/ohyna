@@ -4,7 +4,7 @@
 製品本体のライセンスはリポジトリ直下の [LICENSE](./LICENSE)（MIT）です。  
 各コンポーネントにはそれぞれのライセンスが適用されます。
 
-> **開発者向け:** 画面ヘルプ用の自己完結版は [`docs/license/02-third-party.md`](./docs/license/02-third-party.md) です。依存表記を変えたらヘルプ版も同じ作業単位で更新し、ヘルプ版から本ファイルや `third_party/` へリンクしないこと。
+> **開発者向け:** 画面ヘルプ用の自己完結版は [`docs/license/02-third-party.md`](./docs/license/02-third-party.md) です。依存表記を変えたらヘルプ版も同じ作業単位で更新してください。
 
 実行時に CDN やフォントサービスへ接続する場合があります（PDF／プレビュー／解析）。  
 オフライン専用運用や再配布形態を変える場合は、同梱方針と表記を見直してください。
@@ -31,7 +31,7 @@
 | PyYAML | Front matter / YAML フェンス | MIT |
 | bleach | HTML サニタイズ | Apache-2.0 |
 
-Playwright が取得する **Chromium** バイナリは Playwright の配布条件に従います（リポジトリには含めません。`python -m playwright install chromium` で導入）。
+Playwright が取得する **Chromium** バイナリは Playwright の配布条件に従います。導入は `python -m playwright install chromium` です。
 
 詳細版・推移依存は [third_party/python.md](./third_party/python.md)。
 
@@ -81,10 +81,10 @@ Node 依存のライセンスは `web/package.json` / lock ファイルおよび
 
 ---
 
-## 5. 仕様・規格の「参照」について
+## 5. 仕様・規格の参照について
 
-CommonMark、GFM、ISO 216、BCP 47、JSON Schema、CSS Paged Media などは、**実装の根拠・互換の説明として参照**しています。  
-規格文書そのものを再配布しているわけではありません。製品契約（Ohyna Markdown）と外部仕様の境界は [docs/spec/10-準拠仕様マップ.md](./docs/spec/10-準拠仕様マップ.md) を参照してください。
+CommonMark、GFM、ISO 216、BCP 47、JSON Schema、CSS Paged Media などは、実装の根拠および製品契約との対応を説明する参照です。  
+製品契約（Ohyna Markdown）と外部仕様の境界は [docs/spec/10-準拠仕様マップ.md](./docs/spec/10-準拠仕様マップ.md) に従います。
 
 ---
 
@@ -92,13 +92,13 @@ CommonMark、GFM、ISO 216、BCP 47、JSON Schema、CSS Paged Media などは、
 
 | 場所 | 内容 | 注意 |
 |------|------|------|
-| `themes/covers/**/*.webp` | 表紙背景（style × pattern） | **本プロジェクト向けに生成したオリジナル画像**。第三者ストック素材ではない。ライセンスは本体と同じ MIT（[themes/covers/README.md](./themes/covers/README.md)） |
+| `themes/covers/**/*.webp` | 表紙背景（style × pattern） | **本プロジェクト向けに生成したオリジナル画像**。ライセンスは本体と同じ MIT（[themes/covers/README.md](./themes/covers/README.md)） |
 | `brand/noto-emoji-u1f423.svg` ほか | アプリアイコン（🐣） | Google Noto Color Emoji U+1F423。Copyright 2013 Google LLC。画像リソースは Apache-2.0（[brand/NOTO-EMOJI-NOTICE.txt](./brand/NOTO-EMOJI-NOTICE.txt)） |
 | `themes/` その他 | 印刷 CSS・色テーマ | 本体と同じ MIT |
 | `gui/` | ビルド済みフロント | `web/` からの生成物。依存のライセンスは上記に含む |
 
 表紙 WebP を第三者素材へ差し替える場合は、その素材のライセンス・クレジットを本ファイルに追記してください。  
-`manifest.json` にマシン固有の絶対パスを書かないでください。
+`manifest.json` はリポジトリ相対パスで書きます。
 
 ---
 

@@ -13,6 +13,7 @@
  */
 
 import { APP_DEMO_ORIGIN, APP_REPO_URL } from "./appIdentity";
+import { APP_VERSION } from "./appVersion";
 
 type JsonSchema = Record<string, unknown>;
 
@@ -137,6 +138,7 @@ function buildTools(handlers: WebMcpHandlers): ModelContextTool[] {
       annotations: { readOnlyHint: true },
       execute: async () => ({
         app: "Ohyna",
+        version: APP_VERSION,
         role: "Markdown の編集・検査・プレビュー・PDF 作成",
         page: "/gui/",
         repository: APP_REPO_URL,

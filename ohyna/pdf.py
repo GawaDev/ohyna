@@ -1593,6 +1593,50 @@ def wrap_document_html(
       {{ passive: false, capture: true }}
     );
 
+    // 2 本指ピンチ → 親へ倍率（iframe 内タッチは親に届かない）
+    let __ohynaPinch = false;
+    let __ohynaPinchDist = 0;
+    const __pinchDist = (a, b) =>
+      Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+    document.addEventListener(
+      "touchstart",
+      (e) => {{
+        if (e.touches.length !== 2) return;
+        __ohynaPinch = true;
+        __ohynaPinchDist = __pinchDist(e.touches[0], e.touches[1]);
+      }},
+      {{ passive: true, capture: true }}
+    );
+    document.addEventListener(
+      "touchmove",
+      (e) => {{
+        if (!__ohynaPinch || e.touches.length !== 2) return;
+        e.preventDefault();
+        const dist = __pinchDist(e.touches[0], e.touches[1]);
+        if (__ohynaPinchDist > 0) {{
+          const factor = dist / __ohynaPinchDist;
+          if (Math.abs(factor - 1) >= 0.002) {{
+            post({{ zoomFactor: factor }});
+          }}
+        }}
+        __ohynaPinchDist = dist;
+      }},
+      {{ passive: false, capture: true }}
+    );
+    const __endPinch = (e) => {{
+      if (e.touches.length >= 2) return;
+      __ohynaPinch = false;
+      __ohynaPinchDist = 0;
+    }};
+    document.addEventListener("touchend", __endPinch, {{
+      passive: true,
+      capture: true,
+    }});
+    document.addEventListener("touchcancel", __endPinch, {{
+      passive: true,
+      capture: true,
+    }});
+
     let __ohynaPanning = false;
     let __panX = 0;
     let __panY = 0;

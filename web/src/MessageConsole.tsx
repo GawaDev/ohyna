@@ -35,9 +35,12 @@ import {
 } from "./messageConsoleStore";
 
 const COLLAPSED_H = 36;
+/** タブレット／スマホ向け。ホームインジケータ付近でも押しやすい高さ */
+const COLLAPSED_H_TOUCH = 48;
 const EXPANDED_H = 240;
 
 export const MESSAGE_CONSOLE_COLLAPSED = COLLAPSED_H;
+export const MESSAGE_CONSOLE_COLLAPSED_TOUCH = COLLAPSED_H_TOUCH;
 export const MESSAGE_CONSOLE_EXPANDED = EXPANDED_H;
 
 export type ConsolePreviewState =

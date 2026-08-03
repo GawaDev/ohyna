@@ -26,6 +26,7 @@ import {
 import { notify } from "./notify";
 import { modScrollLabel } from "./platform";
 import { useCtrlWheelZoom } from "./useCtrlWheelZoom";
+import { usePinchZoom } from "./usePinchZoom";
 
 export type DiagramStatus = {
   errorCount: number;
@@ -80,6 +81,8 @@ type PreviewMessage = {
   diagramsReady?: boolean;
   zoom?: number;
   deltaY?: number;
+  /** ピンチの直前フレームからの倍率 */
+  zoomFactor?: number;
   diagramErrorCount?: number;
   diagramErrors?: string[];
   currentPage?: number;
@@ -294,6 +297,12 @@ export const HtmlPreview = memo(function HtmlPreview({
     );
   }, []);
 
+  const zoomByFactor = useCallback((factor: number) => {
+    if (!Number.isFinite(factor) || factor <= 0) return;
+    setFitMode("manual");
+    setZoom(clampZoom(effectiveZoomRef.current * factor));
+  }, []);
+
   const zoomByButton = useCallback((dir: 1 | -1) => {
     setFitMode("manual");
     setZoom(
@@ -396,6 +405,12 @@ export const HtmlPreview = memo(function HtmlPreview({
     onZoom: zoomByWheel,
   });
 
+  usePinchZoom(rootRef, {
+    enabled: Boolean(frameSrc),
+    resetKey: frameSrc,
+    onZoomFactor: zoomByFactor,
+  });
+
   useEffect(() => {
     if (!frameSrc) return;
     // フレーム内スクリプトが落ちてもローディングが永久に残らないようにする
@@ -415,6 +430,7 @@ export const HtmlPreview = memo(function HtmlPreview({
         return;
       }
       if (typeof data.deltaY === "number") zoomByWheel(data.deltaY);
+      if (typeof data.zoomFactor === "number") zoomByFactor(data.zoomFactor);
       if (
         typeof data.a4WidthPx === "number" &&
         typeof data.a4HeightPx === "number" &&
@@ -513,7 +529,13 @@ export const HtmlPreview = memo(function HtmlPreview({
     };
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
-  }, [frameSrc, zoomByWheel, sendRestoreView, syncColorSchemeToFrame]);
+  }, [
+    frameSrc,
+    zoomByWheel,
+    zoomByFactor,
+    sendRestoreView,
+    syncColorSchemeToFrame,
+  ]);
 
   const onFrameLoad = useCallback(() => {
     remesaureFit();

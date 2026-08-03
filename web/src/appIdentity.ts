@@ -1,4 +1,4 @@
-/** 製品識別子（Vite 設定・GUI 双方から参照。import.meta に依存しない） */
+/** 製品識別子（Vite 設定・GUI 双方から参照。import.meta / define に依存しない） */
 
 export const APP_NAME = "Ohyna";
 

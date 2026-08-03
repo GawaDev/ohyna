@@ -23,6 +23,7 @@ import {
   IconScale,
 } from "@tabler/icons-react";
 import { marked } from "marked";
+import { APP_NAME, APP_VERSION } from "./brand";
 
 export type HelpDocItem = {
   id: string;
@@ -68,6 +69,23 @@ function sanitizeHelpHtml(html: string): string {
     .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "")
     .replace(/\son\w+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, "")
     .replace(/javascript:/gi, "");
+}
+
+/** 外部 http(s) リンクを新しいタブで開く */
+function externalizeHelpLinks(html: string): string {
+  return html.replace(/<a\s+([^>]*?)>/gi, (full, attrs: string) => {
+    const hrefMatch = attrs.match(/\bhref\s*=\s*("([^"]*)"|'([^']*)')/i);
+    const href = hrefMatch?.[2] ?? hrefMatch?.[3] ?? "";
+    if (!/^https?:\/\//i.test(href)) return full;
+    let next = attrs;
+    if (!/\btarget\s*=/i.test(next)) {
+      next += ' target="_blank"';
+    }
+    if (!/\brel\s*=/i.test(next)) {
+      next += ' rel="noopener noreferrer"';
+    }
+    return `<a ${next}>`;
+  });
 }
 
 function groupDocs(docs: HelpDocItem[]): { group: string; items: HelpDocItem[] }[] {
@@ -185,7 +203,8 @@ export function HelpModal({ opened, onClose, initialDocId }: Props) {
   const html = useMemo(() => {
     if (!markdown.trim()) return "";
     try {
-      const raw = marked.parse(markdown, { async: false }) as string;
+      const sourced = markdown.replaceAll("__OHYNA_VERSION__", APP_VERSION);
+      const raw = marked.parse(sourced, { async: false }) as string;
       // 見出しに id を付与（頁内アンカー用）
       const withIds = raw.replace(
         /<h([1-4])>([\s\S]*?)<\/h\1>/gi,
@@ -197,7 +216,7 @@ export function HelpModal({ opened, onClose, initialDocId }: Props) {
             : `<h${level}>${inner}</h${level}>`;
         },
       );
-      return sanitizeHelpHtml(withIds);
+      return externalizeHelpLinks(sanitizeHelpHtml(withIds));
     } catch {
       return `<pre>${escapeHtml(markdown)}</pre>`;
     }
@@ -247,6 +266,12 @@ export function HelpModal({ opened, onClose, initialDocId }: Props) {
         `#${CSS.escape(id)}`,
       ) as HTMLElement | null;
       target?.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+
+    if (/^https?:\/\//i.test(href)) {
+      e.preventDefault();
+      window.open(href, "_blank", "noopener,noreferrer");
       return;
     }
 
@@ -417,11 +442,11 @@ export function HelpModal({ opened, onClose, initialDocId }: Props) {
               </ActionIcon>
             </Tooltip>
             <Text size="xs" c="dimmed" ta="center" style={{ flex: 1 }} truncate>
-              {flatIndex >= 0
-                ? `${flatIndex + 1} / ${docs.length}`
-                : loadingList
-                  ? "…"
-                  : ""}
+              {loadingList
+                ? "…"
+                : flatIndex >= 0
+                  ? `${APP_NAME} ${APP_VERSION} · ${flatIndex + 1} / ${docs.length}`
+                  : `${APP_NAME} ${APP_VERSION}`}
             </Text>
             <Tooltip label={nextDoc ? nextDoc.title : "次の項目はありません"} withArrow>
               <ActionIcon

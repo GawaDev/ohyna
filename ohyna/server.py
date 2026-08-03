@@ -66,6 +66,7 @@ _DOCS_CATALOG: list[dict[str, str]] = [
     {"id": "manual/04-writing.md", "title": "本文の書き方", "group": "マニュアル"},
     {"id": "manual/05-preview-and-pdf.md", "title": "確認と PDF 出力", "group": "マニュアル"},
     {"id": "manual/06-troubleshooting.md", "title": "困ったとき", "group": "マニュアル"},
+    {"id": "manual/07-about.md", "title": "プロジェクトについて", "group": "マニュアル"},
     # 仕様書（利用者が画面ヘルプで契約を確認できるもの）
     {"id": "spec/00-概要と方針.md", "title": "概要と方針", "group": "仕様書"},
     {"id": "spec/03-文書設定リファレンス.md", "title": "文書設定リファレンス", "group": "仕様書"},
@@ -146,6 +147,14 @@ class Handler(BaseHTTPRequestHandler):
     def _html(self, code: int, html: str) -> None:
         self._bytes(code, html.encode("utf-8"), "text/html; charset=utf-8")
 
+    def _apply_placeholders(self, data: bytes) -> bytes:
+        """__OHYNA_ORIGIN__ / __OHYNA_VERSION__ を配信時に置換。"""
+        if b"__OHYNA_ORIGIN__" in data:
+            data = data.replace(b"__OHYNA_ORIGIN__", self._origin().encode("utf-8"))
+        if b"__OHYNA_VERSION__" in data:
+            data = data.replace(b"__OHYNA_VERSION__", __version__.encode("utf-8"))
+        return data
+
     def _file(self, path: Path) -> None:
         if not path.is_file():
             self._json(404, {"error": "not found"})
@@ -158,20 +167,22 @@ class Handler(BaseHTTPRequestHandler):
             ctype = "text/css; charset=utf-8"
         elif path.suffix == ".html":
             ctype = "text/html; charset=utf-8"
-            # OGP / canonical の __OHYNA_ORIGIN__ を公開オリジンへ置換
-            if b"__OHYNA_ORIGIN__" in data:
-                origin = self._origin().encode("utf-8")
-                data = data.replace(b"__OHYNA_ORIGIN__", origin)
+            data = self._apply_placeholders(data)
         elif path.suffix == ".wasm":
             ctype = "application/wasm"
         elif path.suffix == ".md":
             ctype = "text/markdown; charset=utf-8"
+            data = self._apply_placeholders(data)
+        elif path.suffix == ".json":
+            ctype = "application/json; charset=utf-8"
+            data = self._apply_placeholders(data)
+            if "manifest" in path.name:
+                ctype = "application/manifest+json; charset=utf-8"
         elif path.suffix in (".webmanifest",) or path.name.endswith(
             "manifest.webmanifest"
         ):
             ctype = "application/manifest+json; charset=utf-8"
-        elif path.suffix == ".json" and "manifest" in path.name:
-            ctype = "application/manifest+json; charset=utf-8"
+            data = self._apply_placeholders(data)
         elif path.suffix == ".webp":
             ctype = "image/webp"
         elif path.suffix == ".png":
@@ -270,11 +281,10 @@ class Handler(BaseHTTPRequestHandler):
             if not catalog.is_file():
                 self._json(404, {"error": "webmcp catalog missing"})
                 return
-            self._text(
-                200,
-                catalog.read_text(encoding="utf-8"),
-                "application/json; charset=utf-8",
-            )
+            body = self._apply_placeholders(
+                catalog.read_text(encoding="utf-8").encode("utf-8")
+            ).decode("utf-8")
+            self._text(200, body, "application/json; charset=utf-8")
             return
         if path == "/robots.txt":
             self._text(

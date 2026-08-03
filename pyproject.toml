@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ohyna"
+version = "1.0.0"
+description = "Ohyna（Open Hybrid Note App）— Markdown から印刷向け PDF"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.11"
+authors = [{ name = "GawaDev" }]
+keywords = ["markdown", "pdf", "mermaid", "print"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Topic :: Text Processing :: Markup",
+]
+dependencies = [
+  "markdown>=3.5",
+  "PyYAML>=6.0",
+  "bleach>=6.0",
+  "Pygments>=2.17",
+  "playwright>=1.40",
+  "pymdown-extensions>=10.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/GawaDev/ohyna"
+Repository = "https://github.com/GawaDev/ohyna"
+Issues = "https://github.com/GawaDev/ohyna/issues"
+Changelog = "https://github.com/GawaDev/ohyna/blob/main/CHANGELOG.md"
+Demo = "https://ohyna.onrender.com/"
+
+[project.scripts]
+ohyna = "ohyna.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["ohyna*"]

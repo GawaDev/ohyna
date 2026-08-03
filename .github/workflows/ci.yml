@@ -37,3 +37,16 @@ jobs:
         run: |
           python -c "import ohyna; assert ohyna.__version__ == open('VERSION', encoding='utf-8').read().strip(), ohyna.__version__"
           python -m ohyna --list-styles
+
+      - name: Docker web-stage context sanity
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          ignore = Path(".dockerignore").read_text(encoding="utf-8")
+          assert "!web/src/sample.md" in ignore, ".dockerignore must keep web/src/sample.md for GUI build"
+          assert Path("web/src/sample.md").is_file()
+          assert Path("VERSION").is_file()
+          web_stage = Path("Dockerfile").read_text(encoding="utf-8").split("FROM mcr.microsoft.com")[0]
+          assert "COPY VERSION" in web_stage, "Dockerfile web stage must COPY VERSION for vite.config.ts"
+          print("docker web context ok")
+          PY

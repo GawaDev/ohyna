@@ -3,6 +3,8 @@
 
 FROM node:22-bookworm AS web
 WORKDIR /src
+# vite.config.ts が親ディレクトリの VERSION を読む
+COPY VERSION ./VERSION
 COPY web/package.json web/package-lock.json ./web/
 RUN cd web && npm ci
 COPY web ./web

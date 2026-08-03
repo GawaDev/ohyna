@@ -24,4 +24,6 @@ SECURITY.md
 THIRD_PARTY.md
 *.md
 !docs/**/*.md
+# GUI ビルドが ?raw で取り込むサンプル文書
+!web/src/sample.md
 gui/

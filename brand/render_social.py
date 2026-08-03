@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """OGP 用の og 画像を生成する。
 
-PWA の screenshots/ は実 GUI のキャプチャが必要。
-→ `python brand/capture_pwa_screenshots.py`（serve 起動済みで）
+文言は web/src/appIdentity.ts の APP_TITLE / APP_NAME_FULL / APP_TAGLINE に合わせる。
+PWA の screenshots/ は実 GUI キャプチャ → `python brand/capture_pwa_screenshots.py`
 """
 
 from __future__ import annotations
@@ -15,9 +15,17 @@ ROOT = Path(__file__).resolve().parent
 PUB = ROOT.parent / "web" / "public"
 MARK = ROOT / "ohyna-mark.png"
 
-# ブランド（web/src/appIdentity.ts の APP_THEME_COLOR / APP_PRIMARY_COLOR と同じ）
+# web/src/appIdentity.ts / brandColors.ts と同じ黄〜橙
 THEME_HEX = "#FFB903"
 PRIMARY_HEX = "#FF8E01"
+CREAM_HEX = "#FFF9E8"
+INK_HEX = "#8F4800"
+MUTED_HEX = "#C96800"
+
+# appIdentity と同期
+APP_TITLE = "Ohyna"
+APP_NAME_FULL = "Open Hybrid Note App／おひな"
+APP_TAGLINE = "Markdown を編集して、PDF にする"
 
 
 def _hex_rgb(hex_color: str) -> tuple[int, int, int]:
@@ -25,11 +33,12 @@ def _hex_rgb(hex_color: str) -> tuple[int, int, int]:
     return (int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16))
 
 
-BG = _hex_rgb(THEME_HEX)
-BG_DARK = _hex_rgb(PRIMARY_HEX)
+CREAM = _hex_rgb(CREAM_HEX)
+THEME = _hex_rgb(THEME_HEX)
+PRIMARY = _hex_rgb(PRIMARY_HEX)
+INK = _hex_rgb(INK_HEX)
+MUTED = _hex_rgb(MUTED_HEX)
 WHITE = (255, 255, 255)
-INK = (15, 23, 42)
-MUTED = (70, 55, 20)
 
 
 def _font(size: int, bold: bool = False) -> ImageFont.ImageFont:
@@ -54,32 +63,49 @@ def _paste_mark(canvas: Image.Image, size: int, xy: tuple[int, int]) -> None:
     canvas.alpha_composite(mark, dest=xy)
 
 
+def _vertical_gradient(
+    size: tuple[int, int], top: tuple[int, int, int], bottom: tuple[int, int, int]
+) -> Image.Image:
+    w, h = size
+    img = Image.new("RGB", (w, h), top)
+    px = img.load()
+    assert px is not None
+    for y in range(h):
+        t = y / max(h - 1, 1)
+        r = int(top[0] + (bottom[0] - top[0]) * t)
+        g = int(top[1] + (bottom[1] - top[1]) * t)
+        b = int(top[2] + (bottom[2] - top[2]) * t)
+        for x in range(w):
+            px[x, y] = (r, g, b)
+    return img.convert("RGBA")
+
+
 def render_og() -> None:
-    """1200×630 Open Graph 画像。"""
+    """1200×630 Open Graph 画像（黄〜橙）。"""
     w, h = 1200, 630
-    img = Image.new("RGBA", (w, h), BG)
+    band_h = 140
+    body_h = h - band_h
+    img = Image.new("RGBA", (w, h), CREAM + (255,))
+    grad = _vertical_gradient((w, body_h), CREAM, THEME)
+    img.paste(grad, (0, 0))
+    band = Image.new("RGBA", (w, band_h), PRIMARY + (255,))
+    img.paste(band, (0, body_h))
+
     draw = ImageDraw.Draw(img)
-    draw.rectangle((0, h - 160, w, h), fill=BG_DARK)
-    _paste_mark(img, 220, (80, 120))
-    title = _font(72, bold=True)
-    body = _font(32)
-    draw.text((340, 160), "Ohyna", fill=INK, font=title)
+    _paste_mark(img, 200, (72, 100))
+    draw.text((320, 130), APP_TITLE, fill=INK, font=_font(78, bold=True))
+    draw.text((320, 240), APP_NAME_FULL, fill=MUTED, font=_font(30))
     draw.text(
-        (340, 260),
-        "Open Hybrid Note App／おひな",
-        fill=MUTED,
-        font=body,
-    )
-    draw.text(
-        (80, 500),
-        "Markdown を編集・検査・プレビューし、印刷向け PDF を作成",
+        (72, body_h + 48),
+        APP_TAGLINE,
         fill=WHITE,
-        font=_font(28),
+        font=_font(30, bold=True),
     )
+
     out = PUB / "og.png"
     PUB.mkdir(parents=True, exist_ok=True)
     img.convert("RGB").save(out, "PNG", optimize=True)
-    print("wrote", out)
+    print("wrote", out, img.size)
 
 
 def main() -> None:

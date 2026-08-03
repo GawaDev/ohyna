@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Markdown → 印刷用 HTML / PDF（一般用途）。
 
-Mermaid flowchart は render_flowchart_svg で埋め込み、Playwright で印刷向け PDF 化します。
+Mermaid flowchart は render_flowchart_svg で埋め込み、Playwright で PDF 化します。
 プロジェクト固有の表記・表紙・除外ルールは呼び出し側／JSON で渡します。
 """
 

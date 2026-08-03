@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "ohyna"
 version = "1.0.0"
-description = "Ohyna（Open Hybrid Note App）— Markdown から印刷向け PDF"
+description = "Ohyna（Open Hybrid Note App）— Markdown を編集して PDF にする"
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.11"

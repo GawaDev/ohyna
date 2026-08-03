@@ -8,6 +8,8 @@ export {
   APP_NAME_FULL,
   APP_SCOPE,
   APP_START_URL,
+  APP_TAGLINE,
+  APP_TITLE,
 } from "./appIdentity";
 
 export { APP_VERSION } from "./appVersion";

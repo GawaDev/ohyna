@@ -1,6 +1,6 @@
 # Ohyna
 
-> Markdown を編集し、検査・プレビューのうえ 1 文書を印刷向け PDF にする製品です。設定は先頭 YAML の `ohyna:` 配下。
+> Markdown を編集してプレビューし、1 文書を PDF にするツールです。設定は先頭 YAML の `ohyna:` 配下。
 
 単一ドキュメント（1 Markdown → 1 PDF）。説明は画面ヘルプ、連携は HTTP API（`/analyze`・`/preview`・`/pdf`）。
 

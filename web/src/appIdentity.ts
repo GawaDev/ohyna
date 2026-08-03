@@ -4,11 +4,15 @@ export const APP_NAME = "Ohyna";
 
 export const APP_NAME_FULL = "Ohyna（Open Hybrid Note App／おひな）";
 
+/** meta description / PWA / OGP 共通の短い説明 */
 export const APP_DESCRIPTION =
-  "Markdown を編集・検査・プレビューし、印刷向け PDF を作成するアプリケーション。";
+  "Markdown を編集してプレビューし、PDF を保存するツール。";
 
-/** ブラウザタブ・OGP 用の短いタイトル */
-export const APP_TITLE = "Ohyna — Markdown から印刷向け PDF";
+/** ブラウザタブ・OGP タイトル */
+export const APP_TITLE = "Ohyna";
+
+/** OGP 画像フッターなど、さらに短い一言 */
+export const APP_TAGLINE = "Markdown を編集して、PDF にする";
 
 /** ブラウザ／PWA の theme-color（ひよこ本体） */
 export const APP_THEME_COLOR = "#FFB903";

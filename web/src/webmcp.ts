@@ -139,7 +139,7 @@ function buildTools(handlers: WebMcpHandlers): ModelContextTool[] {
       execute: async () => ({
         app: "Ohyna",
         version: APP_VERSION,
-        role: "Markdown の編集・検査・プレビュー・PDF 作成",
+        role: "Markdown の編集、プレビュー、PDF の作成",
         page: "/gui/",
         repository: APP_REPO_URL,
         homepage: `${APP_DEMO_ORIGIN}/`,

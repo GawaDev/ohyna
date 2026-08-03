@@ -10,7 +10,7 @@
 
 ### 追加
 
-- Markdown 編集・検査・プレビュー・印刷向け PDF（単一文書）
+- Markdown の編集・プレビュー・PDF（単一文書）
 - Web GUI（PWA）、HTTP API、CLI
 - 公開デモ・サイトメタ（OGP、llms.txt、WebMCP）
 - 画面ヘルプ（マニュアル／仕様／ライセンス）とプロジェクト案内

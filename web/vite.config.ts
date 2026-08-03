@@ -9,9 +9,11 @@ import {
   APP_DESCRIPTION,
   APP_MANIFEST_ID,
   APP_NAME,
+  APP_NAME_FULL,
   APP_SCOPE,
   APP_START_URL,
   APP_THEME_COLOR,
+  APP_TITLE,
 } from "./src/appIdentity";
 
 const rootDir = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -27,9 +29,13 @@ export default defineConfig({
   },
   plugins: [
     {
-      name: "ohyna-theme-color-html",
+      name: "ohyna-html-identity",
       transformIndexHtml(html) {
-        return html.replaceAll("__OHYNA_THEME_COLOR__", APP_THEME_COLOR);
+        return html
+          .replaceAll("__OHYNA_THEME_COLOR__", APP_THEME_COLOR)
+          .replaceAll("__OHYNA_TITLE__", APP_TITLE)
+          .replaceAll("__OHYNA_DESCRIPTION__", APP_DESCRIPTION)
+          .replaceAll("__OHYNA_NAME_FULL__", APP_NAME_FULL);
       },
     },
     react(),

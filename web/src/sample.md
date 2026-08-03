@@ -472,7 +472,7 @@ style = "blue"
 ```ini
 [app]
 name = Ohyna
-port = 8787
+port = 1717
 ```
 
 ```diff

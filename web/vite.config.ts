@@ -148,13 +148,13 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      "/pdf": "http://127.0.0.1:8787",
-      "/preview": "http://127.0.0.1:8787",
-      "/analyze": "http://127.0.0.1:8787",
-      "/styles": "http://127.0.0.1:8787",
-      "/covers": "http://127.0.0.1:8787",
-      "/health": "http://127.0.0.1:8787",
-      "/docs": "http://127.0.0.1:8787",
+      "/pdf": "http://127.0.0.1:1717",
+      "/preview": "http://127.0.0.1:1717",
+      "/analyze": "http://127.0.0.1:1717",
+      "/styles": "http://127.0.0.1:1717",
+      "/covers": "http://127.0.0.1:1717",
+      "/health": "http://127.0.0.1:1717",
+      "/docs": "http://127.0.0.1:1717",
     },
   },
 });

@@ -22,7 +22,7 @@ npm install
 npm run build
 cd ..
 
-python -m ohyna serve --host 127.0.0.1 --port 8787
+python -m ohyna serve --host 127.0.0.1 --port 1717
 ```
 
 文書の置き場は [`docs/INDEX.md`](./docs/INDEX.md)。挙動を変える変更は、実装と `docs/` を同じ作業単位で更新します。

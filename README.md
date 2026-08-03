@@ -21,10 +21,10 @@
 ```bash
 pip install -r requirements.txt
 python -m playwright install chromium
-python -m ohyna serve --host 127.0.0.1 --port 8787
+python -m ohyna serve --host 127.0.0.1 --port 1717
 ```
 
-ブラウザ: [http://127.0.0.1:8787/](http://127.0.0.1:8787/)  
+ブラウザ: [http://127.0.0.1:1717/](http://127.0.0.1:1717/)  
 PWA としてもインストールできます。
 
 ```bash

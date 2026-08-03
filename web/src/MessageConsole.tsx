@@ -35,8 +35,8 @@ import {
 } from "./messageConsoleStore";
 
 const COLLAPSED_H = 36;
-/** タブレット／スマホ向け。ホームインジケータ付近でも押しやすい高さ */
-const COLLAPSED_H_TOUCH = 48;
+/** タブレット／スマホ向け。押しやすさと画面占有のバランス */
+const COLLAPSED_H_TOUCH = 42;
 const EXPANDED_H = 240;
 
 export const MESSAGE_CONSOLE_COLLAPSED = COLLAPSED_H;

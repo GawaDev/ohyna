@@ -3,7 +3,7 @@
   --ohyna-sab: env(safe-area-inset-bottom, 0px);
   --ohyna-sal: env(safe-area-inset-left, 0px);
   --ohyna-sar: env(safe-area-inset-right, 0px);
-  --ohyna-touch-min: 44px;
+  --ohyna-touch-min: 40px;
 }
 
 html,
@@ -562,16 +562,16 @@ html body {
   }
 
   .ohyna-pane-head {
-    flex: 0 0 44px;
-    height: 44px;
-    min-height: 44px;
-    max-height: 44px;
-    padding-inline: 12px !important;
+    flex: 0 0 40px;
+    height: 40px;
+    min-height: 40px;
+    max-height: 40px;
+    padding-inline: 10px !important;
   }
 
   .ohyna-editor-toolbar {
     min-height: var(--ohyna-touch-min);
-    padding-block: 4px;
+    padding-block: 2px;
   }
 
   .ohyna-app .mantine-AppShell-header .mantine-ActionIcon-root,
@@ -588,91 +588,91 @@ html body {
   }
 
   .ohyna-pdf-toolbar {
-    padding: 6px !important;
-    gap: 4px;
+    padding: 4px !important;
+    gap: 2px;
   }
 
   .ohyna-pdf-toolbar .mantine-Text-root {
-    font-size: 13px !important;
-    min-width: 48px;
+    font-size: 12px !important;
+    min-width: 44px;
   }
 
   .mantine-Menu-dropdown .mantine-Menu-item {
     min-height: var(--ohyna-touch-min);
-    font-size: 15px;
-    padding-block: 10px;
+    font-size: 14px;
+    padding-block: 8px;
   }
 
   .ohyna-app .mantine-AppShell-header .mantine-Button-root,
   .ohyna-pane-head .mantine-Button-root {
     min-height: var(--ohyna-touch-min);
-    padding-inline: 12px;
-    font-size: 14px;
+    padding-inline: 10px;
+    font-size: 13px;
   }
 
   .ohyna-editor-toolbar .ohyna-editor-insert-btn {
     min-height: var(--ohyna-touch-min);
-    padding-inline: 12px;
-    font-size: 14px;
+    padding-inline: 10px;
+    font-size: 13px;
   }
 
   .ohyna-mobile-pane-switch {
-    min-height: 48px;
+    min-height: 40px;
   }
 
   .ohyna-mobile-pane-switch .mantine-SegmentedControl-label {
-    min-height: 44px;
+    min-height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 15px;
+    font-size: 13px;
     font-weight: 600;
   }
 
   .ohyna-msg-console__bar {
-    min-height: 48px;
+    min-height: 42px;
   }
 
   .ohyna-msg-console__toggle {
-    min-height: 48px;
-    padding-inline: 10px !important;
+    min-height: 42px;
+    padding-inline: 8px !important;
   }
 
   .ohyna-msg-console__status {
-    min-height: 36px;
-    padding: 6px 10px;
-    gap: 6px;
-    border-radius: 8px;
+    min-height: 32px;
+    padding: 4px 8px;
+    gap: 5px;
+    border-radius: 6px;
   }
 
   .ohyna-msg-console__status .mantine-Text-root {
-    font-size: 13px !important;
+    font-size: 12px !important;
   }
 
   .ohyna-doc-chip {
-    min-height: 32px;
-    padding: 4px 10px 4px 8px;
+    min-height: 28px;
+    padding: 2px 8px 2px 6px;
   }
 
   .ohyna-doc-chip__name {
-    font-size: 13px !important;
+    font-size: 12px !important;
   }
 
   .ohyna-brand-mark {
-    width: 28px;
-    height: 28px;
-    border-radius: 8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 7px;
   }
 
   .ohyna-diag-item {
-    padding: 10px 12px;
-    border-radius: 8px;
+    padding: 8px 10px;
+    border-radius: 6px;
   }
 
   .ohyna-settings-tabs .mantine-Tabs-tab {
     min-height: var(--ohyna-touch-min);
-    font-size: 14px;
-    padding-inline: 14px;
+    font-size: 13px;
+    padding-inline: 12px;
   }
 
   .ohyna-settings-modal-content--full {
@@ -959,13 +959,13 @@ html body {
 }
 
 .ohyna-mobile-console .ohyna-msg-console__tabs {
-  height: 40px;
+  height: 36px;
 }
 
 .ohyna-mobile-console .ohyna-msg-console__tab {
-  font-size: 13px;
-  min-height: 36px;
-  padding: 8px 12px;
+  font-size: 12px;
+  min-height: 32px;
+  padding: 6px 10px;
   display: inline-flex;
   align-items: center;
 }
@@ -1625,8 +1625,8 @@ html body {
     padding: 14px !important;
   }
   .ohyna-help-main-head {
-    padding-inline: 14px !important;
-    min-height: 48px;
+    padding-inline: 12px !important;
+    min-height: 42px;
   }
   .ohyna-help-modal-header .mantine-CloseButton-root,
   .ohyna-help-main-head .mantine-ActionIcon-root {
@@ -1636,8 +1636,8 @@ html body {
     height: var(--ohyna-touch-min);
   }
   .ohyna-help-nav .mantine-NavLink-root {
-    min-height: 44px;
-    font-size: 14px;
+    min-height: 40px;
+    font-size: 13px;
   }
 }
 

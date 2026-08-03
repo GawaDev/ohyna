@@ -22,7 +22,7 @@ def public_origin(host: str, *, forwarded_proto: str | None = None) -> str:
     env = (os.environ.get("OHYNA_PUBLIC_ORIGIN") or "").strip().rstrip("/")
     if env:
         return env
-    host = (host or "").strip() or "127.0.0.1:8787"
+    host = (host or "").strip() or "127.0.0.1:1717"
     proto = (forwarded_proto or "").split(",")[0].strip().lower()
     if proto not in ("http", "https"):
         # 開発ホストは http、それ以外は https を既定

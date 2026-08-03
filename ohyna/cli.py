@@ -68,7 +68,7 @@ def main(argv: list[str] | None = None) -> int:
         default="127.0.0.1",
         help="バインド先（本番例: 127.0.0.1 のまま前段プロキシのみ公開、または 0.0.0.0）",
     )
-    s.add_argument("--port", type=int, default=8787)
+    s.add_argument("--port", type=int, default=1717)
 
     args = p.parse_args(argv)
 

@@ -104,8 +104,8 @@ class Handler(BaseHTTPRequestHandler):
         allowed = {
             f"http://{host}",
             f"https://{host}",
-            "http://127.0.0.1:8787",
-            "http://localhost:8787",
+            "http://127.0.0.1:1717",
+            "http://localhost:1717",
             "http://127.0.0.1:5173",
             "http://localhost:5173",
         }
@@ -505,7 +505,7 @@ class Handler(BaseHTTPRequestHandler):
         sys.stderr.write("%s - %s\n" % (self.address_string(), fmt % args))
 
 
-def create_httpd(host: str = "127.0.0.1", port: int = 8787) -> ThreadingHTTPServer:
+def create_httpd(host: str = "127.0.0.1", port: int = 1717) -> ThreadingHTTPServer:
     """HTTP サーバを生成する（port=0 なら空きポートを割り当て）。"""
     if host not in ("127.0.0.1", "localhost", "::1"):
         print(
@@ -521,7 +521,7 @@ def create_httpd(host: str = "127.0.0.1", port: int = 8787) -> ThreadingHTTPServ
     return ThreadingHTTPServer((host, port), Handler)
 
 
-def serve(host: str = "127.0.0.1", port: int = 8787) -> None:
+def serve(host: str = "127.0.0.1", port: int = 1717) -> None:
     httpd = create_httpd(host, port)
     print(f"Ohyna GUI  http://{host}:{port}/")
     print(

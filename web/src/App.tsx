@@ -199,11 +199,11 @@ export default function App() {
   const consoleCollapsed = touchUi
     ? MESSAGE_CONSOLE_COLLAPSED_TOUCH
     : MESSAGE_CONSOLE_COLLAPSED;
-  const headerHeight = isPhone ? 52 : touchUi ? 48 : 40;
-  const chromeIconSize = touchUi ? "lg" : "sm";
-  const chromeIconPx = touchUi ? 20 : 16;
-  const chromeBtnSize = touchUi ? "sm" : "compact-xs";
-  const brandMarkPx = touchUi ? 28 : 22;
+  const headerHeight = isPhone ? 46 : touchUi ? 44 : 40;
+  const chromeIconSize = touchUi ? "md" : "sm";
+  const chromeIconPx = touchUi ? 18 : 16;
+  const chromeBtnSize = touchUi ? "compact-sm" : "compact-xs";
+  const brandMarkPx = touchUi ? 24 : 22;
   const [mobilePane, setMobilePane] = useState<"edit" | "preview" | "console">(
     "edit"
   );
@@ -1809,7 +1809,7 @@ export default function App() {
                   aria-hidden
                 />
                 <Text
-                  size={touchUi ? "md" : "sm"}
+                  size="sm"
                   fw={700}
                   className="ohyna-brand-title"
                   component="span"
@@ -2135,7 +2135,7 @@ export default function App() {
             {isPhone ? (
               <SegmentedControl
                 className="ohyna-mobile-pane-switch"
-                size="md"
+                size="sm"
                 fullWidth
                 value={mobilePane}
                 onChange={(v) =>
@@ -2391,7 +2391,7 @@ export default function App() {
                     setShellSizes(sizes);
                     const bottom = sizes[1];
                     if (typeof bottom === "string" && bottom.endsWith("px")) {
-                      setConsoleOpen(parseFloat(bottom) > 48);
+                      setConsoleOpen(parseFloat(bottom) > consoleCollapsed + 6);
                     } else if (typeof bottom === "number") {
                       setConsoleOpen(bottom > 6);
                     }

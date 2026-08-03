@@ -28,9 +28,9 @@
   --line-height: 1.7;
   --letter-spacing: 0;
   --h2-bg: var(--accent-50);
-  --h2-padding: 8px 14px;
-  --h2-border-left: 5px solid var(--accent-700);
-  --h2-radius: 0 var(--radius-md) var(--radius-md) 0;
+  --h2-padding: 8px 14px 8px 19px;
+  --h2-accent-width: 5px;
+  --h2-radius: var(--radius-md);
   --th-bg: var(--accent-800);
   --th-fg: var(--cover-fg);
   --th-border: var(--accent-900);
@@ -235,12 +235,25 @@ h1 {
 }
 
 h2 {
+  position: relative;
   font-size: 13.5pt;
   margin: 22px 0 10px;
   padding: var(--h2-padding);
   background: var(--h2-bg);
-  border-left: var(--h2-border-left);
   border-radius: var(--h2-radius);
+  overflow: hidden;
+}
+
+/* 左アクセント（border-left だと角丸の左上下が直角のまま残る） */
+h2::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: var(--h2-accent-width);
+  background: var(--accent-700);
+  pointer-events: none;
 }
 
 h3 {
@@ -273,8 +286,13 @@ p {
   widows: 3;
 }
 
-/* 本文段落の字下げ（1文字） */
-.content > p {
+/*
+ * 本文段落の字下げ（1文字）。
+ * 見出し keep-next で包まれた p も対象（直下セレクタだけだと字下げが消える）。
+ */
+.content > p,
+.content > .ohyna-keep-next > p,
+.content > .ohyna-keep > p {
   text-indent: 1em;
 }
 

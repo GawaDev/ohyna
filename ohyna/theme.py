@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+from functools import lru_cache
 from pathlib import Path
 
 from .design import DocumentDesign
@@ -11,6 +12,18 @@ from .style import DiagramStyle, _darken, _lighten
 _PACKAGE_DIR = Path(__file__).resolve().parent
 _SERVICE_ROOT = _PACKAGE_DIR.parent
 DEFAULT_PRINT_CSS = _SERVICE_ROOT / "themes" / "blue-print.css"
+
+
+@lru_cache(maxsize=4)
+def _base_print_css_cached(mtime_ns: int) -> str:
+    base_path = DEFAULT_PRINT_CSS
+    return base_path.read_text(encoding="utf-8") if base_path.is_file() else ""
+
+
+def _base_print_css() -> str:
+    base_path = DEFAULT_PRINT_CSS
+    mtime_ns = base_path.stat().st_mtime_ns if base_path.is_file() else 0
+    return _base_print_css_cached(mtime_ns)
 
 
 def cover_colors(style_name: str | None = "blue") -> tuple[str, str, str]:
@@ -81,6 +94,7 @@ def _root_overrides(style: DiagramStyle, *, style_name: str = "blue") -> str:
 """.strip()
 
 
+@lru_cache(maxsize=32)
 def theme_overrides_css(style_name: str | None = "blue") -> str:
     """文書テーマ名に対応する :root 変数のみ。"""
     name = (style_name or "blue").strip() or "blue"
@@ -97,9 +111,7 @@ def load_print_css(
     design: DocumentDesign | None = None,
 ) -> str:
     """ベース印刷 CSS + テーマ色 + レイアウト指定（後勝ち）。"""
-    base_path = DEFAULT_PRINT_CSS
-    base = base_path.read_text(encoding="utf-8") if base_path.is_file() else ""
-    parts = [base, theme_overrides_css(style_name)]
+    parts = [_base_print_css(), theme_overrides_css(style_name)]
     d = design or DocumentDesign()
     parts.append(d.to_css_vars())
     return "\n\n".join(parts)

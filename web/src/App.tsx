@@ -1,4 +1,6 @@
 import {
+  lazy,
+  Suspense,
   useCallback,
   useEffect,
   useMemo,
@@ -42,7 +44,6 @@ import {
   IconWindowMaximize,
   IconX,
 } from "@tabler/icons-react";
-import CodeMirror from "@uiw/react-codemirror";
 import type { EditorView } from "@codemirror/view";
 import {
   applyEditorDiagnostics,
@@ -63,6 +64,7 @@ import {
 } from "./fileIo";
 import {
   applySettingsToMarkdown,
+  frontmatterBlock,
   hasDocumentSettings,
   REQUIRED_SETTINGS,
   settingsFromMarkdown,
@@ -70,7 +72,6 @@ import {
   type DocumentSettings,
 } from "./frontmatter";
 import { APP_MARK_SRC, APP_NAME, APP_NAME_FULL } from "./brand";
-import { HelpModal } from "./HelpModal";
 import { tryRegisterWebMcpTools } from "./webmcp";
 import { HtmlPreview } from "./HtmlPreview";
 import {
@@ -91,7 +92,6 @@ import {
   upsertConsoleEntry,
 } from "./messageConsoleStore";
 import { notify } from "./notify";
-import { PdfConfirmModal } from "./PdfConfirmModal";
 import {
   createConsolePopoutChannel,
   openConsolePopout,
@@ -118,8 +118,18 @@ import {
   type DocumentNav,
   type OpenedDocument,
 } from "./documentNav";
-import { SettingsModal } from "./SettingsModal";
 import { UnsavedChangesModal } from "./UnsavedChangesModal";
+import { MarkdownEditor } from "./MarkdownEditor";
+
+const HelpModal = lazy(() =>
+  import("./HelpModal").then((m) => ({ default: m.HelpModal }))
+);
+const SettingsModal = lazy(() =>
+  import("./SettingsModal").then((m) => ({ default: m.SettingsModal }))
+);
+const PdfConfirmModal = lazy(() =>
+  import("./PdfConfirmModal").then((m) => ({ default: m.PdfConfirmModal }))
+);
 
 type PreviewState = "idle" | "loading" | "ready" | "error" | "blocked";
 function analysisBlockMessage(diagnostics: MdDiagnostic[]): string {
@@ -190,7 +200,7 @@ export default function App() {
   const [savedContent, setSavedContent] = useState(EMPTY_MARKDOWN);
   const [docName, setDocName] = useState<string | null>(null);
   const fileHandleRef = useRef<TextFileHandle | null>(null);
-  /** BOM/改行差で偽の未保存にしない */
+  /** 入出力は常に normalize 済みなので文字列比較だけでよい */
   const dirty =
     sessionReady &&
     normalizeMarkdownText(markdown) !== normalizeMarkdownText(savedContent);
@@ -233,6 +243,12 @@ export default function App() {
   const pdfUrlRef = useRef<string | null>(null);
   const pdfBlobRef = useRef<Blob | null>(null);
   const previewAbortRef = useRef<AbortController | null>(null);
+  const lastPreviewKeyRef = useRef<string>("");
+  const hasPreviewHtmlRef = useRef(false);
+  /** 手動「プレビューを更新」中は debounce 側の自動更新を抑止 */
+  const suppressAutoPreviewRef = useRef(false);
+  const markdownRef = useRef(markdown);
+  markdownRef.current = markdown;
   const editorViewRef = useRef<EditorView | null>(null);
 
   useEffect(() => {
@@ -254,7 +270,17 @@ export default function App() {
   const [pdfConfirmOpened, pdfConfirmHandlers] = useDisclosure(false);
   const [helpOpened, helpHandlers] = useDisclosure(false);
   const [helpDocId, setHelpDocId] = useState<string | undefined>(undefined);
-  const settingsMissing = !hasDocumentSettings(markdown);
+  /** 本文打鍵では再計算しない（設定適用直後にプレビューが消えるのを防ぐ） */
+  const frontmatterKey = useMemo(
+    () => frontmatterBlock(markdown),
+    [markdown]
+  );
+  const settingsMissing = useMemo(
+    () => !hasDocumentSettings(markdown),
+    // frontmatterKey が変わったときだけ。markdown はクロージャで最新を読む
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional
+    [frontmatterKey]
+  );
   const [consoleOpen, setConsoleOpen] = useState(false);
   const [consolePopped, setConsolePopped] = useState(false);
   /** 起動時: 権限再許可が必要な前回ファイル */
@@ -457,30 +483,40 @@ export default function App() {
   useEffect(() => {
     if (!sessionReady) return;
     analyzeAbortRef.current?.abort();
+    // 新しい debounce 源へ移るとき、遅い旧プレビューが後から勝たないように中断
+    previewAbortRef.current?.abort();
+    previewAbortRef.current = null;
+    setBusy(false);
+    setPreviewState((s) => {
+      if (s !== "loading") return s;
+      return hasPreviewHtmlRef.current ? "ready" : "idle";
+    });
+
     const ac = new AbortController();
     analyzeAbortRef.current = ac;
     setAnalyzePending(true);
     setServerDiagnostics(null);
     setAnalyzeGate(null);
+    const source = debouncedMarkdown;
 
     const run = async () => {
       try {
-        const result = await fetchAnalyze(debouncedMarkdown, ac.signal);
-        if (ac.signal.aborted) return;
+        const result = await fetchAnalyze(source, ac.signal);
+        if (ac.signal.aborted || analyzeAbortRef.current !== ac) return;
         setServerDiagnostics(result.diagnostics);
         setAnalyzeGate({
-          source: debouncedMarkdown,
+          source,
           ok: result.ok,
           diagnostics: result.diagnostics,
         });
       } catch (e) {
         if (e instanceof DOMException && e.name === "AbortError") return;
-        if (ac.signal.aborted) return;
+        if (ac.signal.aborted || analyzeAbortRef.current !== ac) return;
         // サーバ未到達時はローカル即時チェックでゲート
-        const local = analyzeMarkdown(debouncedMarkdown);
+        const local = analyzeMarkdown(source);
         setServerDiagnostics(null);
         setAnalyzeGate({
-          source: debouncedMarkdown,
+          source,
           ok: local.every((d) => d.severity !== "error"),
           diagnostics: local,
         });
@@ -800,14 +836,30 @@ export default function App() {
     openConsolePane();
   };
 
-  const lastPreviewKeyRef = useRef<string>("");
-  const hasPreviewHtmlRef = useRef(false);
   /** Splitter 終了時にプレビュー幅フィットを再計測（内容の再取得はしない） */
   const [previewLayoutTick, setPreviewLayoutTick] = useState(0);
 
   useEffect(() => {
     setPreviewLayoutTick((n) => n + 1);
   }, [isNarrow, isPhone, mobilePane]);
+
+  const onPreviewDiagramStatus = useCallback(
+    (status: { errorCount: number; errors: string[] }) => {
+      setDiagramErrorCount(status.errorCount);
+      setDiagramErrorHint(
+        status.errorCount > 0
+          ? [
+              `Mermaid ダイアグラム ${status.errorCount} 件の描画に失敗しました。`,
+              status.errors[0] || "",
+              "プレビュー内の赤い枠を確認してください。",
+            ]
+              .filter(Boolean)
+              .join("\n")
+          : ""
+      );
+    },
+    []
+  );
 
   const refreshPreview = useCallback(
     async (source: string, opts?: { force?: boolean }) => {
@@ -844,6 +896,8 @@ export default function App() {
       }
       const ac = new AbortController();
       previewAbortRef.current = ac;
+      const stillCurrent = () =>
+        !ac.signal.aborted && previewAbortRef.current === ac;
       setBusy(true);
       setPreviewState("loading");
       setErrorMessage("");
@@ -859,6 +913,7 @@ export default function App() {
           body: JSON.stringify({ markdown: source }),
           signal: ac.signal,
         });
+        if (!stillCurrent()) return;
         if (!res.ok) {
           let msg = res.statusText;
           let diagnostics: MdDiagnostic[] | undefined;
@@ -871,6 +926,7 @@ export default function App() {
           } catch {
             /* ignore */
           }
+          if (!stillCurrent()) return;
           if (res.status === 422 && diagnostics) {
             setServerDiagnostics(diagnostics);
             setAnalyzeGate({ source, ok: false, diagnostics });
@@ -888,6 +944,7 @@ export default function App() {
           throw new Error(msg);
         }
         const data = (await res.json()) as { html?: string };
+        if (!stillCurrent()) return;
         if (!data.html) throw new Error("プレビュー HTML が空です");
         lastPreviewKeyRef.current = source;
         hasPreviewHtmlRef.current = true;
@@ -895,6 +952,7 @@ export default function App() {
         setPreviewState("ready");
       } catch (e) {
         if (e instanceof DOMException && e.name === "AbortError") return;
+        if (!stillCurrent()) return;
         const msg = e instanceof Error ? e.message : String(e);
         setPreviewState("error");
         setErrorMessage(msg);
@@ -931,6 +989,13 @@ export default function App() {
     if (!analyzeGate || analyzeGate.source !== debouncedMarkdown) {
       return;
     }
+    if (suppressAutoPreviewRef.current) {
+      return;
+    }
+    // 入力で本文が先に進んでいるときは、古いゲートでプレビューしない
+    if (analyzeGate.source !== markdownRef.current) {
+      return;
+    }
     if (!analyzeGate.ok) {
       blockPreviewForAnalysis(analyzeGate.diagnostics);
       const errors = analyzeGate.diagnostics.filter(
@@ -956,14 +1021,20 @@ export default function App() {
     blockPreviewForAnalysis,
   ]);
 
-  const markdownRef = useRef(markdown);
-  markdownRef.current = markdown;
-
+  const forceRefreshGenRef = useRef(0);
   const forceRefreshPreview = async () => {
     const source = markdown;
+    const gen = ++forceRefreshGenRef.current;
+    // 手動更新中は debounce 解析を差し替え、自動プレビュー二重起動を抑止
+    analyzeAbortRef.current?.abort();
+    const ac = new AbortController();
+    analyzeAbortRef.current = ac;
+    suppressAutoPreviewRef.current = true;
     setAnalyzePending(true);
     try {
-      const result = await fetchAnalyze(source);
+      const result = await fetchAnalyze(source, ac.signal);
+      if (gen !== forceRefreshGenRef.current || ac.signal.aborted) return;
+      if (markdownRef.current !== source) return;
       setServerDiagnostics(result.diagnostics);
       setAnalyzeGate({
         source,
@@ -980,7 +1051,10 @@ export default function App() {
         return;
       }
       await refreshPreview(source, { force: true });
-    } catch {
+    } catch (e) {
+      if (e instanceof DOMException && e.name === "AbortError") return;
+      if (gen !== forceRefreshGenRef.current || ac.signal.aborted) return;
+      if (markdownRef.current !== source) return;
       const local = analyzeMarkdown(source);
       setServerDiagnostics(null);
       const ok = local.every((d) => d.severity !== "error");
@@ -996,7 +1070,12 @@ export default function App() {
       }
       await refreshPreview(source, { force: true });
     } finally {
-      setAnalyzePending(false);
+      if (gen === forceRefreshGenRef.current) {
+        suppressAutoPreviewRef.current = false;
+        if (analyzeAbortRef.current === ac) {
+          setAnalyzePending(false);
+        }
+      }
     }
   };
   const forceRefreshPreviewRef = useRef(forceRefreshPreview);
@@ -1932,27 +2011,13 @@ export default function App() {
               </Group>
             </Group>
             <EditorToolbar getView={() => editorViewRef.current} />
-            <Box className="ohyna-editor-wrap" mih={0}>
-              <CodeMirror
+                <Box className="ohyna-editor-wrap" mih={0}>
+              <MarkdownEditor
                 value={markdown}
-                height="100%"
-                theme="none"
-                basicSetup={{
-                  lineNumbers: true,
-                  foldGutter: true,
-                  highlightActiveLine: true,
-                  highlightSelectionMatches: true,
-                  bracketMatching: true,
-                  autocompletion: false,
-                  searchKeymap: true,
-                }}
                 extensions={editorExtensions}
                 onChange={onEditorChange}
-                onCreateEditor={(view) => {
-                  editorViewRef.current = view;
-                  applyEditorDiagnostics(view, mdDiagnosticsRef.current);
-                }}
-                aria-label="Markdown編集"
+                viewRef={editorViewRef}
+                diagnosticsRef={mdDiagnosticsRef}
               />
             </Box>
           </Box>
@@ -2031,26 +2096,12 @@ export default function App() {
                 </Group>
                 <EditorToolbar getView={() => editorViewRef.current} />
                 <Box className="ohyna-editor-wrap" mih={0}>
-                  <CodeMirror
+                  <MarkdownEditor
                     value={markdown}
-                    height="100%"
-                    theme="none"
-                    basicSetup={{
-                      lineNumbers: true,
-                      foldGutter: true,
-                      highlightActiveLine: true,
-                      highlightSelectionMatches: true,
-                      bracketMatching: true,
-                      autocompletion: false,
-                      searchKeymap: true,
-                    }}
                     extensions={editorExtensions}
                     onChange={onEditorChange}
-                    onCreateEditor={(view) => {
-                      editorViewRef.current = view;
-                      applyEditorDiagnostics(view, mdDiagnosticsRef.current);
-                    }}
-                    aria-label="Markdown編集"
+                    viewRef={editorViewRef}
+                    diagnosticsRef={mdDiagnosticsRef}
                   />
                 </Box>
               </Box>
@@ -2128,20 +2179,7 @@ export default function App() {
                       <HtmlPreview
                         html={previewHtml}
                         layoutTick={previewLayoutTick}
-                        onDiagramStatus={(status) => {
-                          setDiagramErrorCount(status.errorCount);
-                          setDiagramErrorHint(
-                            status.errorCount > 0
-                              ? [
-                                  `Mermaid ダイアグラム ${status.errorCount} 件の描画に失敗しました。`,
-                                  status.errors[0] || "",
-                                  "プレビュー内の赤い枠を確認してください。",
-                                ]
-                                  .filter(Boolean)
-                                  .join("\n")
-                              : ""
-                          );
-                        }}
+                        onDiagramStatus={onPreviewDiagramStatus}
                       />
                       {previewState === "loading" && previewHtml && (
                         <Overlay
@@ -2243,30 +2281,36 @@ export default function App() {
         )}
       </AppShell.Main>
 
-      <SettingsModal
-        opened={settingsOpened}
-        markdown={markdown}
-        onClose={closeSettings}
-        onApply={applySettings}
-      />
-
-      <HelpModal
-        opened={helpOpened}
-        onClose={() => {
-          helpHandlers.close();
-          setHelpDocId(undefined);
-        }}
-        initialDocId={helpDocId}
-      />
-
-      <PdfConfirmModal
-        opened={pdfConfirmOpened}
-        url={pdfUrl}
-        filename={`${slugName(markdown)}.pdf`}
-        onClose={pdfConfirmHandlers.close}
-        onSave={() => void savePdfDocument()}
-        onPrint={() => void printPdfDocument()}
-      />
+      <Suspense fallback={null}>
+        {settingsOpened ? (
+          <SettingsModal
+            opened={settingsOpened}
+            markdown={markdown}
+            onClose={closeSettings}
+            onApply={applySettings}
+          />
+        ) : null}
+        {helpOpened ? (
+          <HelpModal
+            opened={helpOpened}
+            onClose={() => {
+              helpHandlers.close();
+              setHelpDocId(undefined);
+            }}
+            initialDocId={helpDocId}
+          />
+        ) : null}
+        {pdfConfirmOpened ? (
+          <PdfConfirmModal
+            opened={pdfConfirmOpened}
+            url={pdfUrl}
+            filename={`${slugName(markdown)}.pdf`}
+            onClose={pdfConfirmHandlers.close}
+            onSave={() => void savePdfDocument()}
+            onPrint={() => void printPdfDocument()}
+          />
+        ) : null}
+      </Suspense>
 
       <UnsavedChangesModal
         opened={pendingNav != null}

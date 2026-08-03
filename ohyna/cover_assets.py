@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import base64
 import re
+from functools import lru_cache
 from pathlib import Path
 
 _PACKAGE_DIR = Path(__file__).resolve().parent
@@ -21,6 +22,7 @@ def cover_background_path(style_name: str, pattern: str) -> Path:
     return COVERS_DIR / safe_style / f"{safe_pat}{COVER_IMAGE_EXT}"
 
 
+@lru_cache(maxsize=64)
 def cover_background_data_uri(style_name: str, pattern: str) -> str | None:
     """画像があれば data URI。無ければ None（単色フォールバック）。"""
     path = cover_background_path(style_name, pattern)

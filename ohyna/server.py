@@ -398,10 +398,10 @@ class Handler(BaseHTTPRequestHandler):
 
     def _run_analyze(self, markdown: str) -> tuple[list, int, int] | None:
         """静的解析を実行。失敗時はエラー JSON を送って None。"""
-        from .analyze import analyze_markdown
+        from .analyze_cache import analyze_markdown_cached
 
         try:
-            diagnostics = analyze_markdown(str(markdown))
+            diagnostics = analyze_markdown_cached(str(markdown))
         except Exception as e:  # noqa: BLE001
             self._json(400, {"error": self._public_error(e)})
             return None

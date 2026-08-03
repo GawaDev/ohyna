@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  memo,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   ActionIcon,
   Center,
@@ -154,7 +161,7 @@ function withPreviewColorScheme(
   return out;
 }
 
-export function HtmlPreview({
+export const HtmlPreview = memo(function HtmlPreview({
   html,
   layoutTick = 0,
   onDiagramStatus,
@@ -669,4 +676,4 @@ export function HtmlPreview({
       </div>
     </div>
   );
-}
+});

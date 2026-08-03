@@ -597,13 +597,14 @@ class DocumentDesign:
         # 表紙背景は themes/covers の静的画像。CSS 変数は不要。
         if self.heading_band:
             h2_bg = "var(--accent-50)"
-            h2_pad = "8px 14px"
-            h2_border = "5px solid var(--accent-700)"
-            h2_radius = "0 var(--radius-md) var(--radius-md) 0"
+            # 左アクセント 5px + 内側余白 14px（border-left 廃止・::before 化）
+            h2_pad = "8px 14px 8px 19px"
+            h2_accent_w = "5px"
+            h2_radius = "var(--radius-md)"
         else:
             h2_bg = "transparent"
             h2_pad = "4px 0"
-            h2_border = "0 solid transparent"
+            h2_accent_w = "0px"
             h2_radius = "0"
 
         if self.table_header_fill:
@@ -668,7 +669,7 @@ class DocumentDesign:
   --letter-spacing: {letter_spacing};
   --h2-bg: {h2_bg};
   --h2-padding: {h2_pad};
-  --h2-border-left: {h2_border};
+  --h2-accent-width: {h2_accent_w};
   --h2-radius: {h2_radius};
   --th-bg: {th_bg};
   --th-fg: {th_fg};

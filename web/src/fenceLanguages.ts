@@ -3,6 +3,7 @@
  * 成果物の見た目の基準は Pygments。ここに無い稀な名前は編集中だけプレーン表示になりうる。
  *
  * 対象は sample.md／マニュアルで使う言語＋製品エイリアス。
+ * 重い @codemirror/lang-* / legacy-modes は LanguageDescription.load で遅延読込する。
  */
 import {
   markdown as cmMarkdown,
@@ -14,31 +15,6 @@ import {
   StreamLanguage,
   type StreamParser,
 } from "@codemirror/language";
-import { yaml } from "@codemirror/lang-yaml";
-import { json } from "@codemirror/lang-json";
-import { javascript } from "@codemirror/lang-javascript";
-import { python } from "@codemirror/lang-python";
-import { html } from "@codemirror/lang-html";
-import { css } from "@codemirror/lang-css";
-import { shell } from "@codemirror/legacy-modes/mode/shell";
-import { stexMath } from "@codemirror/legacy-modes/mode/stex";
-import {
-  c,
-  cpp,
-  csharp,
-  java,
-  kotlin,
-} from "@codemirror/legacy-modes/mode/clike";
-import { standardSQL } from "@codemirror/legacy-modes/mode/sql";
-import { go } from "@codemirror/legacy-modes/mode/go";
-import { rust } from "@codemirror/legacy-modes/mode/rust";
-import { ruby } from "@codemirror/legacy-modes/mode/ruby";
-import { powerShell } from "@codemirror/legacy-modes/mode/powershell";
-import { toml } from "@codemirror/legacy-modes/mode/toml";
-import { xml } from "@codemirror/legacy-modes/mode/xml";
-import { diff } from "@codemirror/legacy-modes/mode/diff";
-import { properties } from "@codemirror/legacy-modes/mode/properties";
-import { dockerFile } from "@codemirror/legacy-modes/mode/dockerfile";
 
 function streamSupport(parser: StreamParser<unknown>): LanguageSupport {
   return new LanguageSupport(StreamLanguage.define(parser));
@@ -145,8 +121,6 @@ const mermaidStream = StreamLanguage.define({
   },
 });
 
-const stexMathSupport = new LanguageSupport(StreamLanguage.define(stexMath));
-
 /** ツールバー「コードフェンス」挿入用（表示名 → info 言語トークン） */
 export const fenceInsertLanguages: { label: string; lang: string }[] = [
   { label: "プレーン", lang: "text" },
@@ -184,7 +158,10 @@ export const codeLanguages: LanguageDescription[] = [
   LanguageDescription.of({
     name: "KaTeX / TeX",
     alias: ["math", "latex", "katex", "tex", "stex"],
-    support: stexMathSupport,
+    async load() {
+      const { stexMath } = await import("@codemirror/legacy-modes/mode/stex");
+      return new LanguageSupport(StreamLanguage.define(stexMath));
+    },
   }),
   LanguageDescription.of({
     name: "Plain text",
@@ -199,27 +176,42 @@ export const codeLanguages: LanguageDescription[] = [
   LanguageDescription.of({
     name: "YAML",
     alias: ["yml", "yaml"],
-    support: yaml(),
+    async load() {
+      const { yaml } = await import("@codemirror/lang-yaml");
+      return yaml();
+    },
   }),
   LanguageDescription.of({
     name: "JSON",
     alias: ["json"],
-    support: json(),
+    async load() {
+      const { json } = await import("@codemirror/lang-json");
+      return json();
+    },
   }),
   LanguageDescription.of({
     name: "JavaScript",
     alias: ["js", "javascript", "mjs", "cjs"],
-    support: javascript(),
+    async load() {
+      const { javascript } = await import("@codemirror/lang-javascript");
+      return javascript();
+    },
   }),
   LanguageDescription.of({
     name: "TypeScript",
     alias: ["ts", "typescript"],
-    support: javascript({ typescript: true }),
+    async load() {
+      const { javascript } = await import("@codemirror/lang-javascript");
+      return javascript({ typescript: true });
+    },
   }),
   LanguageDescription.of({
     name: "Python",
     alias: ["py", "python"],
-    support: python(),
+    async load() {
+      const { python } = await import("@codemirror/lang-python");
+      return python();
+    },
   }),
   LanguageDescription.of({
     name: "PHP",
@@ -229,92 +221,152 @@ export const codeLanguages: LanguageDescription[] = [
   LanguageDescription.of({
     name: "HTML",
     alias: ["html", "htm"],
-    support: html(),
+    async load() {
+      const { html } = await import("@codemirror/lang-html");
+      return html();
+    },
   }),
   LanguageDescription.of({
     name: "CSS",
     alias: ["css"],
-    support: css(),
+    async load() {
+      const { css } = await import("@codemirror/lang-css");
+      return css();
+    },
   }),
   LanguageDescription.of({
     name: "Shell",
     alias: ["bash", "sh", "shell", "zsh"],
-    support: streamSupport(shell),
+    async load() {
+      const { shell } = await import("@codemirror/legacy-modes/mode/shell");
+      return streamSupport(shell);
+    },
   }),
   LanguageDescription.of({
     name: "PowerShell",
     alias: ["powershell", "ps1", "pwsh"],
-    support: streamSupport(powerShell),
+    async load() {
+      const { powerShell } = await import(
+        "@codemirror/legacy-modes/mode/powershell"
+      );
+      return streamSupport(powerShell);
+    },
   }),
   LanguageDescription.of({
     name: "SQL",
     alias: ["sql"],
-    support: streamSupport(standardSQL),
+    async load() {
+      const { standardSQL } = await import("@codemirror/legacy-modes/mode/sql");
+      return streamSupport(standardSQL);
+    },
   }),
   LanguageDescription.of({
     name: "Go",
     alias: ["go", "golang"],
-    support: streamSupport(go),
+    async load() {
+      const { go } = await import("@codemirror/legacy-modes/mode/go");
+      return streamSupport(go);
+    },
   }),
   LanguageDescription.of({
     name: "Rust",
     alias: ["rust", "rs"],
-    support: streamSupport(rust),
+    async load() {
+      const { rust } = await import("@codemirror/legacy-modes/mode/rust");
+      return streamSupport(rust);
+    },
   }),
   LanguageDescription.of({
     name: "Java",
     alias: ["java"],
-    support: streamSupport(java),
+    async load() {
+      const { java } = await import("@codemirror/legacy-modes/mode/clike");
+      return streamSupport(java);
+    },
   }),
   LanguageDescription.of({
     name: "C#",
     alias: ["csharp", "cs"],
-    support: streamSupport(csharp),
+    async load() {
+      const { csharp } = await import("@codemirror/legacy-modes/mode/clike");
+      return streamSupport(csharp);
+    },
   }),
   LanguageDescription.of({
     name: "C",
     alias: ["c", "h"],
-    support: streamSupport(c),
+    async load() {
+      const { c } = await import("@codemirror/legacy-modes/mode/clike");
+      return streamSupport(c);
+    },
   }),
   LanguageDescription.of({
     name: "C++",
     alias: ["cpp", "c++", "hpp", "cc", "cxx"],
-    support: streamSupport(cpp),
+    async load() {
+      const { cpp } = await import("@codemirror/legacy-modes/mode/clike");
+      return streamSupport(cpp);
+    },
   }),
   LanguageDescription.of({
     name: "Kotlin",
     alias: ["kotlin", "kt"],
-    support: streamSupport(kotlin),
+    async load() {
+      const { kotlin } = await import("@codemirror/legacy-modes/mode/clike");
+      return streamSupport(kotlin);
+    },
   }),
   LanguageDescription.of({
     name: "Ruby",
     alias: ["ruby", "rb"],
-    support: streamSupport(ruby),
+    async load() {
+      const { ruby } = await import("@codemirror/legacy-modes/mode/ruby");
+      return streamSupport(ruby);
+    },
   }),
   LanguageDescription.of({
     name: "TOML",
     alias: ["toml"],
-    support: streamSupport(toml),
+    async load() {
+      const { toml } = await import("@codemirror/legacy-modes/mode/toml");
+      return streamSupport(toml);
+    },
   }),
   LanguageDescription.of({
     name: "XML",
     alias: ["xml", "svg"],
-    support: streamSupport(xml),
+    async load() {
+      const { xml } = await import("@codemirror/legacy-modes/mode/xml");
+      return streamSupport(xml);
+    },
   }),
   LanguageDescription.of({
     name: "Diff",
     alias: ["diff", "patch"],
-    support: streamSupport(diff),
+    async load() {
+      const { diff } = await import("@codemirror/legacy-modes/mode/diff");
+      return streamSupport(diff);
+    },
   }),
   LanguageDescription.of({
     name: "INI / Properties",
     alias: ["ini", "properties", "conf"],
-    support: streamSupport(properties),
+    async load() {
+      const { properties } = await import(
+        "@codemirror/legacy-modes/mode/properties"
+      );
+      return streamSupport(properties);
+    },
   }),
   LanguageDescription.of({
     name: "Dockerfile",
     alias: ["dockerfile", "docker"],
-    support: streamSupport(dockerFile),
+    async load() {
+      const { dockerFile } = await import(
+        "@codemirror/legacy-modes/mode/dockerfile"
+      );
+      return streamSupport(dockerFile);
+    },
   }),
   LanguageDescription.of({
     name: "Markdown",

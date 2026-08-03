@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 import re
+import threading
 from dataclasses import asdict, dataclass
 from typing import Any, Literal
 
@@ -37,7 +38,7 @@ from .fences import (
 )
 from .frontmatter import OHYNA_KEY, extract_ohyna_config
 from .katex_js import KATEX_JS_MJS, KATEX_NET_ALLOW_PREFIX
-from .mermaid_js import get_shared_browser
+from .mermaid_js import get_shared_browser, parse_mermaid_source
 from .mermaid_lexer import register_mermaid_lexer
 from .style import list_presets
 
@@ -632,18 +633,37 @@ def _analyze_markdown_structure(text: str, fences: list[FenceBlock]) -> list[Dia
     return out
 
 
+def _document_diagram_style(text: str) -> str:
+    """front matter の色テーマ。PDF と同じ style で描画検証し SVG キャッシュを効かせる。"""
+    try:
+        fm = re.match(r"\A---\s*\n(.*?)\n---\s*\n?", text, flags=re.S)
+        if not fm:
+            return "blue"
+        data = yaml.safe_load(fm.group(1)) or {}
+        if not isinstance(data, dict):
+            return "blue"
+        cfg = extract_ohyna_config(data)
+        style = str(cfg.get("style") or "").strip()
+        if style and style in _STYLE_VALUES:
+            return style
+    except Exception:  # noqa: BLE001
+        pass
+    return "blue"
+
+
 def _validate_mermaid(
     mermaid_blocks: list[FenceBlock],
     *,
+    style: str = "blue",
     code: str = "MERMAID_RENDER",
 ) -> list[Diagnostic]:
-    """PDF 生成と同じ ``render_flowchart_svg`` で Mermaid 構文を検証する。"""
+    """PDF 生成と同じ ``render_flowchart_svg`` で Mermaid を検証する。"""
     out: list[Diagnostic] = []
     for f in mermaid_blocks:
         if not f.body.strip():
             continue
         try:
-            render_flowchart_svg(f.body, style="blue")
+            render_flowchart_svg(f.body, style=style)
         except Exception as e:  # noqa: BLE001
             msg = str(e).splitlines()[0][:240] or e.__class__.__name__
             out.append(
@@ -656,6 +676,119 @@ def _validate_mermaid(
                 )
             )
     return out
+
+
+def _validate_mermaid_code(mermaid_code_blocks: list[FenceBlock]) -> list[Diagnostic]:
+    """``mermaid code`` は構文のみ（SVG 生成なし）。"""
+    out: list[Diagnostic] = []
+    for f in mermaid_code_blocks:
+        if not f.body.strip():
+            continue
+        try:
+            parse_mermaid_source(f.body)
+        except Exception as e:  # noqa: BLE001
+            msg = str(e).splitlines()[0][:240] or e.__class__.__name__
+            out.append(
+                Diagnostic(
+                    "error",
+                    f"Mermaid 構文エラー: {msg}",
+                    f.line,
+                    "mermaid",
+                    "MERMAID_CODE_SYNTAX",
+                )
+            )
+    return out
+
+
+_KATEX_ORIGIN = "http://ohyna-analyze.local"
+_katex_page_local = threading.local()
+
+_KATEX_SHELL_HTML = f"""<!DOCTYPE html>
+<html><head><meta charset="utf-8" /></head><body>
+<script type="module">
+const KATEX_MJS = {json.dumps(KATEX_JS_MJS)};
+let katexMod = null;
+async function ensureKatex() {{
+  if (katexMod) return katexMod;
+  katexMod = (await import(KATEX_MJS)).default;
+  return katexMod;
+}}
+window.__validateKatex = async (jobs) => {{
+  const results = [];
+  try {{
+    const katex = await ensureKatex();
+    for (const job of jobs) {{
+      try {{
+        const out = katex.renderToString(job.source, {{
+          throwOnError: false,
+          displayMode: !!job.displayMode,
+          strict: "ignore",
+          trust: false,
+        }});
+        const bad = typeof out === "string" && out.includes("katex-error");
+        if (bad) {{
+          results.push({{
+            id: job.id,
+            ok: false,
+            line: job.line,
+            error: "KaTeX が数式を解釈できませんでした",
+          }});
+        }} else {{
+          results.push({{ id: job.id, ok: true, line: job.line }});
+        }}
+      }} catch (e) {{
+        const msg = (e && e.message) ? e.message : String(e);
+        results.push({{
+          id: job.id,
+          ok: false,
+          line: job.line,
+          error: String(msg).split("\\n")[0].slice(0, 240),
+        }});
+      }}
+    }}
+    return {{ ok: true, results }};
+  }} catch (e) {{
+    return {{ ok: false, error: String(e && e.message ? e.message : e) }};
+  }}
+}};
+window.__boot = true;
+</script>
+</body></html>
+"""
+
+
+def _get_katex_worker_page():
+    page = getattr(_katex_page_local, "page", None)
+    if page is not None and not page.is_closed():
+        return page
+    browser = get_shared_browser()
+    page = browser.new_page()
+    allow = (
+        "https://cdn.jsdelivr.net/",
+        "https://fastly.jsdelivr.net/",
+        "https://gcore.jsdelivr.net/",
+        KATEX_NET_ALLOW_PREFIX,
+    )
+
+    def on_route(route) -> None:
+        url = route.request.url
+        if url.startswith(f"{_KATEX_ORIGIN}/"):
+            route.fulfill(
+                status=200,
+                content_type="text/html; charset=utf-8",
+                body=_KATEX_SHELL_HTML,
+            )
+            return
+        if any(url.startswith(p) for p in allow):
+            route.continue_()
+            return
+        route.abort()
+
+    page.route("**/*", on_route)
+    page.goto(f"{_KATEX_ORIGIN}/analyze-katex", wait_until="load")
+    page.wait_for_function("window.__boot === true", timeout=180000)
+    _katex_page_local.page = page
+    return page
 
 
 def _validate_katex(math_exprs: list[tuple[str, int, str]]) -> list[Diagnostic]:
@@ -672,108 +805,33 @@ def _validate_katex(math_exprs: list[tuple[str, int, str]]) -> list[Diagnostic]:
         }
         for i, (expr, line, display) in enumerate(math_exprs)
     ]
-    payload = {"jobs": jobs, "katexMjs": KATEX_JS_MJS}
-    html = f"""<!DOCTYPE html>
-<html><head><meta charset="utf-8" /></head><body>
-<script type="module">
-const cfg = {json.dumps(payload, ensure_ascii=False)};
-window.__results = [];
-window.__done = false;
-try {{
-  const katex = (await import(cfg.katexMjs)).default;
-  for (const job of cfg.jobs) {{
-    try {{
-      const out = katex.renderToString(job.source, {{
-        throwOnError: false,
-        displayMode: !!job.displayMode,
-        strict: "ignore",
-        trust: false,
-      }});
-      const bad = typeof out === "string" && out.includes("katex-error");
-      if (bad) {{
-        window.__results.push({{
-          id: job.id,
-          ok: false,
-          line: job.line,
-          error: "KaTeX が数式を解釈できませんでした",
-        }});
-      }} else {{
-        window.__results.push({{ id: job.id, ok: true, line: job.line }});
-      }}
-    }} catch (e) {{
-      const msg = (e && e.message) ? e.message : String(e);
-      window.__results.push({{
-        id: job.id,
-        ok: false,
-        line: job.line,
-        error: String(msg).split("\\n")[0].slice(0, 240),
-      }});
-    }}
-  }}
-}} catch (e) {{
-  window.__bootError = String(e && e.message ? e.message : e);
-}}
-window.__done = true;
-</script>
-</body></html>
-"""
-
-    browser = get_shared_browser()
-    page = browser.new_page()
     out: list[Diagnostic] = []
-    try:
-        origin = "http://ohyna-analyze.local"
-        allow = (
-            "https://cdn.jsdelivr.net/",
-            "https://fastly.jsdelivr.net/",
-            "https://gcore.jsdelivr.net/",
-            KATEX_NET_ALLOW_PREFIX,
+    page = _get_katex_worker_page()
+    result = page.evaluate("(jobs) => window.__validateKatex(jobs)", jobs)
+    if not isinstance(result, dict) or not result.get("ok"):
+        err = (result or {}).get("error") if isinstance(result, dict) else result
+        out.append(
+            Diagnostic(
+                "error",
+                f"KaTeX 検証の起動に失敗: {err}",
+                1,
+                "engine",
+                "KATEX_BOOT",
+            )
         )
-
-        def on_route(route) -> None:
-            url = route.request.url
-            if url.startswith(f"{origin}/"):
-                route.fulfill(
-                    status=200,
-                    content_type="text/html; charset=utf-8",
-                    body=html,
-                )
-                return
-            if any(url.startswith(p) for p in allow):
-                route.continue_()
-                return
-            route.abort()
-
-        page.route("**/*", on_route)
-        page.goto(f"{origin}/analyze-katex", wait_until="load")
-        page.wait_for_function("window.__done === true", timeout=180000)
-        boot = page.evaluate("window.__bootError || null")
-        if boot:
-            out.append(
-                Diagnostic(
-                    "error",
-                    f"KaTeX 検証の起動に失敗: {boot}",
-                    1,
-                    "engine",
-                    "KATEX_BOOT",
-                )
+        return out
+    for r in result.get("results") or []:
+        if r.get("ok"):
+            continue
+        out.append(
+            Diagnostic(
+                "error",
+                f"KaTeX 構文エラー: {r.get('error') or 'unknown'}",
+                r.get("line"),
+                "katex",
+                "KATEX_RENDER",
             )
-            return out
-        results = page.evaluate("window.__results || []")
-        for r in results:
-            if r.get("ok"):
-                continue
-            out.append(
-                Diagnostic(
-                    "error",
-                    f"KaTeX 構文エラー: {r.get('error') or 'unknown'}",
-                    r.get("line"),
-                    "katex",
-                    "KATEX_RENDER",
-                )
-            )
-    finally:
-        page.close()
+        )
     return out
 
 
@@ -781,10 +839,16 @@ def _validate_engines(
     mermaid_blocks: list[FenceBlock],
     mermaid_code_blocks: list[FenceBlock],
     math_exprs: list[tuple[str, int, str]],
+    *,
+    diagram_style: str = "blue",
 ) -> list[Diagnostic]:
     out: list[Diagnostic] = []
-    out.extend(_validate_mermaid(mermaid_blocks, code="MERMAID_RENDER"))
-    out.extend(_validate_mermaid(mermaid_code_blocks, code="MERMAID_CODE_SYNTAX"))
+    out.extend(
+        _validate_mermaid(
+            mermaid_blocks, style=diagram_style, code="MERMAID_RENDER"
+        )
+    )
+    out.extend(_validate_mermaid_code(mermaid_code_blocks))
     out.extend(_validate_katex(math_exprs))
     return out
 
@@ -822,8 +886,14 @@ def analyze_markdown(markdown: str) -> list[dict[str, Any]]:
     all_math = math_fence_exprs + inline_math
 
     try:
+        diagram_style = _document_diagram_style(text)
         diags.extend(
-            _validate_engines(mermaid_blocks, mermaid_code_blocks, all_math)
+            _validate_engines(
+                mermaid_blocks,
+                mermaid_code_blocks,
+                all_math,
+                diagram_style=diagram_style,
+            )
         )
     except Exception as e:  # noqa: BLE001
         diags.append(

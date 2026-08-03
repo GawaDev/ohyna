@@ -450,6 +450,12 @@ export const REQUIRED_SETTINGS = [
 export type SettingsIssue = { field: string; message: string };
 
 /** ohyna 名前空間ブロックがあるか */
+export function frontmatterBlock(markdown: string): string {
+  const src = String(markdown || "").replace(/^\uFEFF/, "");
+  const m = src.match(/^---\r?\n[\s\S]*?\r?\n---/);
+  return m ? m[0] : "";
+}
+
 export function hasOhynaFrontmatter(markdown: string): boolean {
   const root = parseFrontmatterRoot(markdown);
   const value = root[OHYNA_KEY];

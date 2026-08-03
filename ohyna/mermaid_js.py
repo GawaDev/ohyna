@@ -217,43 +217,20 @@ def _shutdown_playwright() -> None:
 atexit.register(_shutdown_playwright)
 
 
-def render_with_mermaid_js(
-    mermaid_src: str,
-    style: DiagramStyle,
-    *,
-    use_elk: bool = False,
-    curve: str = "stepAfter",
-    node_spacing: int = 48,
-    rank_spacing: int = 56,
-    padding: int = 8,
-) -> str:
-    """Playwright + Mermaid.js で SVG を生成し、余白を切り詰めて返す（全図種）。"""
-    source = _normalize_source(mermaid_src)
-    kind = detect_diagram_kind(source)
-    is_flow = kind.lower() in ("flowchart", "graph")
-    theme_vars = style_to_theme_variables(style)
-    payload = {
-        "source": source,
-        "kind": kind,
-        "isFlowchart": is_flow,
-        "themeVariables": theme_vars,
-        "useElk": bool(use_elk and is_flow),
-        "curve": curve,
-        "mermaidCdn": MERMAID_CDN,
-        "elkCdn": ELK_CDN,
-        "zenumlCdn": ZENUML_CDN,
-        "nodeSpacing": node_spacing,
-        "rankSpacing": rank_spacing,
-        "padding": padding,
-        "fontPx": style.font_px,
-    }
+_MERMAID_ORIGIN = "http://mermaid.local"
+_CDN_ALLOW = (
+    "https://cdn.jsdelivr.net/",
+    "https://fastly.jsdelivr.net/",
+    "https://gcore.jsdelivr.net/",
+)
 
-    html = f"""<!DOCTYPE html>
+# スレッドローカル永続ページ用シェル（CDN は初回だけ読み、以降は render/parse）
+_MERMAID_SHELL_HTML = f"""<!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
   <style>
-    html, body {{ margin: 0; padding: 0; background: {style.background}; }}
+    html, body {{ margin: 0; padding: 0; background: #fff; }}
     #out {{ display: inline-block; }}
     #out svg {{ max-width: none !important; height: auto !important; }}
   </style>
@@ -280,10 +257,26 @@ def render_with_mermaid_js(
     }})();
   </script>
   <script type="module">
-    const cfg = {json.dumps(payload, ensure_ascii=False)};
-    const out = document.getElementById("out");
+    {CROP_SVG_WHITESPACE_JS}
+    const MERMAID_CDN = {json.dumps(MERMAID_CDN)};
+    const ELK_CDN = {json.dumps(ELK_CDN)};
+    const ZENUML_CDN = {json.dumps(ZENUML_CDN)};
+    let mermaidMod = null;
+    let elkRegistered = false;
 
-    function baseInit(layout) {{
+    async function ensureMermaid() {{
+      if (mermaidMod) return mermaidMod;
+      mermaidMod = (await import(MERMAID_CDN)).default;
+      try {{
+        const zenuml = (await import(ZENUML_CDN)).default;
+        await mermaidMod.registerExternalDiagrams([zenuml]);
+      }} catch (e) {{
+        // ZenUML 未使用時は無視
+      }}
+      return mermaidMod;
+    }}
+
+    function baseInit(cfg, layout) {{
       return {{
         startOnLoad: false,
         securityLevel: "loose",
@@ -310,100 +303,155 @@ def render_with_mermaid_js(
       }};
     }}
 
-    try {{
-      const mermaid = (await import(cfg.mermaidCdn)).default;
+    window.__renderMermaid = async (cfg) => {{
+      const out = document.getElementById("out");
+      document.body.style.background = cfg.themeVariables.background || "#fff";
       try {{
-        const zenuml = (await import(cfg.zenumlCdn)).default;
-        await mermaid.registerExternalDiagrams([zenuml]);
-      }} catch (e) {{
-        // ZenUML 未使用時は無視
-      }}
-      if (cfg.useElk) {{
-        try {{
-          const elk = await import(cfg.elkCdn);
-          mermaid.registerLayoutLoaders(elk);
-          mermaid.initialize(baseInit("elk"));
-        }} catch (e) {{
-          mermaid.initialize(baseInit());
+        const mermaid = await ensureMermaid();
+        if (cfg.useElk) {{
+          if (!elkRegistered) {{
+            try {{
+              const elk = await import(ELK_CDN);
+              mermaid.registerLayoutLoaders(elk);
+              elkRegistered = true;
+            }} catch (e) {{
+              // ELK 失敗時は通常レイアウト
+            }}
+          }}
+          mermaid.initialize(baseInit(cfg, elkRegistered ? "elk" : undefined));
+        }} else {{
+          mermaid.initialize(baseInit(cfg));
         }}
-      }} else {{
-        mermaid.initialize(baseInit());
+        const id = "mmd-" + Math.random().toString(36).slice(2);
+        const {{ svg }} = await mermaid.render(id, cfg.source);
+        out.innerHTML = svg;
+        const root = out.querySelector("svg");
+        if (root && cfg.isFlowchart) {{
+          const line = cfg.themeVariables.lineColor || "#1565c0";
+          const border = cfg.themeVariables.nodeBorder || line;
+          root.querySelectorAll("marker path, defs marker path").forEach((el) => {{
+            el.setAttribute("fill", line);
+            el.setAttribute("stroke", line);
+          }});
+          root.querySelectorAll(".node rect, .node circle, .node polygon, .cluster rect").forEach((el) => {{
+            if (el.getAttribute("stroke")) el.setAttribute("stroke", border);
+          }});
+          cropSvgWhitespace(root, 2);
+          root.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+          return {{ ok: true, svg: root.outerHTML }};
+        }}
+        if (!root) return {{ ok: false, error: "no svg" }};
+        cropSvgWhitespace(root, 2);
+        root.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+        return {{ ok: true, svg: root.outerHTML }};
+      }} catch (e) {{
+        out.textContent = "";
+        return {{ ok: false, error: String(e && e.stack ? e.stack : e) }};
       }}
-      const id = "mmd-" + Math.random().toString(36).slice(2);
-      const {{ svg }} = await mermaid.render(id, cfg.source);
-      out.innerHTML = svg;
-      const root = out.querySelector("svg");
-      if (root && cfg.isFlowchart) {{
-        const line = cfg.themeVariables.lineColor || "#1565c0";
-        const border = cfg.themeVariables.nodeBorder || line;
-        root.querySelectorAll("marker path, defs marker path").forEach((el) => {{
-          el.setAttribute("fill", line);
-          el.setAttribute("stroke", line);
-        }});
-        root.querySelectorAll(".node rect, .node circle, .node polygon, .cluster rect").forEach((el) => {{
-          if (el.getAttribute("stroke")) el.setAttribute("stroke", border);
-        }});
+    }};
+
+    window.__parseMermaid = async (source) => {{
+      try {{
+        const mermaid = await ensureMermaid();
+        mermaid.initialize({{ startOnLoad: false, securityLevel: "loose" }});
+        if (typeof mermaid.parse === "function") {{
+          await mermaid.parse(source);
+        }} else {{
+          const id = "mmd-parse-" + Math.random().toString(36).slice(2);
+          await mermaid.render(id, source);
+        }}
+        return {{ ok: true }};
+      }} catch (e) {{
+        return {{
+          ok: false,
+          error: String(e && e.message ? e.message : e).split("\\n")[0].slice(0, 240),
+        }};
       }}
-      window.__ok = true;
-      window.__error = null;
-    }} catch (e) {{
-      window.__ok = false;
-      window.__error = String(e && e.stack ? e.stack : e);
-      out.textContent = window.__error;
-    }}
+    }};
+
+    window.__boot = true;
   </script>
 </body>
 </html>
 """
 
+
+def _get_mermaid_worker_page():
+    """Mermaid CDN を載せたスレッドローカル永続ページ。"""
+    page = getattr(_thread_local, "mermaid_page", None)
+    if page is not None and not page.is_closed():
+        return page
+
     browser = _get_thread_browser()
     page = browser.new_page()
-    try:
-        origin = "http://mermaid.local"
-        cdn_allow = (
-            "https://cdn.jsdelivr.net/",
-            "https://fastly.jsdelivr.net/",
-            "https://gcore.jsdelivr.net/",
-        )
 
-        def on_route(route) -> None:
-            url = route.request.url
-            if url.startswith(f"{origin}/"):
-                route.fulfill(
-                    status=200,
-                    content_type="text/html; charset=utf-8",
-                    body=html,
-                )
-                return
-            if any(url.startswith(p) for p in cdn_allow):
-                route.continue_()
-                return
-            route.abort()
+    def on_route(route) -> None:
+        url = route.request.url
+        if url.startswith(f"{_MERMAID_ORIGIN}/"):
+            route.fulfill(
+                status=200,
+                content_type="text/html; charset=utf-8",
+                body=_MERMAID_SHELL_HTML,
+            )
+            return
+        if any(url.startswith(p) for p in _CDN_ALLOW):
+            route.continue_()
+            return
+        route.abort()
 
-        page.route("**/*", on_route)
-        page.goto(f"{origin}/render", wait_until="load")
-        page.wait_for_function(
-            "window.__ok === true || window.__ok === false", timeout=120000
-        )
-        ok = page.evaluate("window.__ok")
-        if not ok:
-            err = page.evaluate("window.__error")
-            raise RuntimeError(f"Mermaid render failed ({kind}): {err}")
-        svg = page.evaluate(
-            "() => {\n"
-            + CROP_SVG_WHITESPACE_JS
-            + """
-              const svg = document.querySelector('#out svg');
-              if (!svg) return null;
-              cropSvgWhitespace(svg, 2);
-              svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-              return svg.outerHTML;
-            }
-            """
-        )
-    finally:
-        page.close()
+    page.route("**/*", on_route)
+    page.goto(f"{_MERMAID_ORIGIN}/worker", wait_until="load")
+    page.wait_for_function("window.__boot === true", timeout=120000)
+    _thread_local.mermaid_page = page
+    return page
 
+
+def render_with_mermaid_js(
+    mermaid_src: str,
+    style: DiagramStyle,
+    *,
+    use_elk: bool = False,
+    curve: str = "stepAfter",
+    node_spacing: int = 48,
+    rank_spacing: int = 56,
+    padding: int = 8,
+) -> str:
+    """Playwright + Mermaid.js で SVG を生成し、余白を切り詰めて返す（全図種）。"""
+    source = _normalize_source(mermaid_src)
+    kind = detect_diagram_kind(source)
+    is_flow = kind.lower() in ("flowchart", "graph")
+    theme_vars = style_to_theme_variables(style)
+    payload = {
+        "source": source,
+        "kind": kind,
+        "isFlowchart": is_flow,
+        "themeVariables": theme_vars,
+        "useElk": bool(use_elk and is_flow),
+        "curve": curve,
+        "nodeSpacing": node_spacing,
+        "rankSpacing": rank_spacing,
+        "padding": padding,
+        "fontPx": style.font_px,
+    }
+
+    page = _get_mermaid_worker_page()
+    result = page.evaluate("(cfg) => window.__renderMermaid(cfg)", payload)
+    if not isinstance(result, dict) or not result.get("ok"):
+        err = (result or {}).get("error") if isinstance(result, dict) else result
+        raise RuntimeError(f"Mermaid render failed ({kind}): {err}")
+    svg = result.get("svg")
     if not svg:
         raise RuntimeError(f"Mermaid render produced no SVG ({kind})")
-    return svg
+    return str(svg)
+
+
+def parse_mermaid_source(mermaid_src: str) -> None:
+    """構文のみ検証する（SVG は生成しない）。失敗時は RuntimeError。"""
+    source = _normalize_source(mermaid_src)
+    if not source:
+        return
+    page = _get_mermaid_worker_page()
+    result = page.evaluate("(src) => window.__parseMermaid(src)", source)
+    if not isinstance(result, dict) or not result.get("ok"):
+        err = (result or {}).get("error") if isinstance(result, dict) else result
+        raise RuntimeError(str(err or "Mermaid parse failed"))

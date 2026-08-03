@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "protocol": "WebMCP",
   "page": "/gui/",
+  "repository": "https://github.com/GawaDev/ohyna",
+  "homepage": "https://ohyna.onrender.com/",
+  "demoGui": "https://ohyna.onrender.com/gui/",
+  "issues": "https://github.com/GawaDev/ohyna/issues",
   "spec": "https://webmachinelearning.github.io/webmcp/",
   "chromeDocs": "https://developer.chrome.com/docs/ai/webmcp/imperative-api",
   "registration": [

@@ -17,8 +17,10 @@ Ohyna はサーバに配置し、利用者がブラウザから利用します�
 
 優先順:
 
-1. GitHub リポジトリの Security Advisory（Private vulnerability reporting）
-2. リポジトリのメンテナ（GitHub プロフィールまたは README に記載の連絡先）
+1. [GitHub Security Advisory（Private vulnerability reporting）](https://github.com/GawaDev/ohyna/security/advisories/new)
+2. [Issue](https://github.com/GawaDev/ohyna/issues)（公開してよい範囲の連絡）またはメンテナへの個別連絡
+
+ソース: [https://github.com/GawaDev/ohyna](https://github.com/GawaDev/ohyna)
 
 報告に含めてほしい情報:
 

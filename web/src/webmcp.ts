@@ -12,6 +12,8 @@
  * @see /webmcp.json （ツール一覧の静的カタログ）
  */
 
+import { APP_DEMO_ORIGIN, APP_REPO_URL } from "./appIdentity";
+
 type JsonSchema = Record<string, unknown>;
 
 type ToolAnnotations = {
@@ -137,6 +139,8 @@ function buildTools(handlers: WebMcpHandlers): ModelContextTool[] {
         app: "Ohyna",
         role: "Markdown の編集・検査・プレビュー・PDF 作成",
         page: "/gui/",
+        repository: APP_REPO_URL,
+        homepage: `${APP_DEMO_ORIGIN}/`,
         notes: [
           "プレビューは体裁確認用です",
           "PDF の保存と印刷は利用者の操作が必要な場合があります",

@@ -278,6 +278,7 @@ export function HelpModal({ opened, onClose, initialDocId }: Props) {
       radius={0}
       closeButtonProps={{ "aria-label": "閉じる" }}
       overlayProps={{ backgroundOpacity: 0.45 }}
+      transitionProps={{ transition: "fade", duration: 200 }}
       classNames={{
         content: "ohyna-help-modal-content",
         header: "ohyna-help-modal-header",

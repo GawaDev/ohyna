@@ -28,6 +28,7 @@ from urllib.parse import unquote, urlparse
 from . import __version__
 from .cover_assets import COVERS_DIR, cover_background_path
 from .paths import ensure_under
+from .project_meta import DEMO_GUI_URL, DEMO_ORIGIN, ISSUES_URL, REPO_URL
 from .site_meta import (
     build_llms_full,
     build_sitemap_xml,
@@ -157,6 +158,10 @@ class Handler(BaseHTTPRequestHandler):
             ctype = "text/css; charset=utf-8"
         elif path.suffix == ".html":
             ctype = "text/html; charset=utf-8"
+            # OGP / canonical の __OHYNA_ORIGIN__ を公開オリジンへ置換
+            if b"__OHYNA_ORIGIN__" in data:
+                origin = self._origin().encode("utf-8")
+                data = data.replace(b"__OHYNA_ORIGIN__", origin)
         elif path.suffix == ".wasm":
             ctype = "application/wasm"
         elif path.suffix == ".md":
@@ -213,6 +218,11 @@ class Handler(BaseHTTPRequestHandler):
                     "service": "Ohyna",
                     "version": __version__,
                     "gui": True,
+                    "repository": REPO_URL,
+                    "demo": DEMO_ORIGIN,
+                    "demoGui": DEMO_GUI_URL,
+                    "issues": ISSUES_URL,
+                    "origin": self._origin(),
                     "bindHint": "production: reverse-proxy + TLS + auth in front",
                     "endpoints": [
                         "GET /",

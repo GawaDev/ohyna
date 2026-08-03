@@ -3,6 +3,14 @@
   "private": true,
   "version": "1.0.0",
   "license": "MIT",
+  "homepage": "https://ohyna.onrender.com/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GawaDev/ohyna.git"
+  },
+  "bugs": {
+    "url": "https://github.com/GawaDev/ohyna/issues"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",

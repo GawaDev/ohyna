@@ -2,6 +2,11 @@
 
 版: **1.0.0**
 
+| | |
+|--|--|
+| ソース | [https://github.com/GawaDev/ohyna](https://github.com/GawaDev/ohyna) |
+| デモ | [https://ohyna.onrender.com/](https://ohyna.onrender.com/) |
+
 ## 配信の区分
 
 サービス利用者が読めるのは、画面ヘルプに掲載された文書です。リポジトリ直下のファイルや開発用パスは、利用者の閲覧対象外です。

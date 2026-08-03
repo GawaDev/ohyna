@@ -4,6 +4,14 @@
 
 扱う単位は単一ドキュメント（1 Markdown → 1 PDF）です。利用者向けの説明は画面ヘルプ、プログラム連携は HTTP API（`/analyze`・`/preview`・`/pdf`）を参照してください。
 
+## Project
+
+- [Source (GitHub)](https://github.com/GawaDev/ohyna): ソースコード
+- [Demo](https://ohyna.onrender.com/): 公開デモ
+- [GUI](/gui/): このオリジンの編集画面
+- [Issues](https://github.com/GawaDev/ohyna/issues): 不具合・要望
+- [Security advisories](https://github.com/GawaDev/ohyna/security/advisories/new): 脆弱性報告
+
 ## Docs
 
 - [はじめに](/docs/manual/01-intro.md): 製品概要と標準の作業手順
@@ -18,7 +26,6 @@
 - [入力解読仕様](/docs/spec/08-入力解読仕様.md): 入力契約
 - [出力仕様](/docs/spec/09-出力仕様.md): 出力契約
 - [準拠仕様マップ](/docs/spec/10-準拠仕様マップ.md): 外部仕様との境界
-- [サイトメタと WebMCP](/docs/spec/11-サイトメタとWebMCP.md): llms・sitemap・WebMCP
 - [MIT License](/docs/license/01-mit.md): ライセンス本文
 - [第三者コンポーネント](/docs/license/02-third-party.md): 第三者表記
 

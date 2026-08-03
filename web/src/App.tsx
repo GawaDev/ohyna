@@ -270,6 +270,19 @@ export default function App() {
   const [pdfConfirmOpened, pdfConfirmHandlers] = useDisclosure(false);
   const [helpOpened, helpHandlers] = useDisclosure(false);
   const [helpDocId, setHelpDocId] = useState<string | undefined>(undefined);
+  /** 初回オープン以降はマウント維持（開閉トランジション用。初回のみ lazy 読込） */
+  const [settingsMounted, setSettingsMounted] = useState(false);
+  const [helpMounted, setHelpMounted] = useState(false);
+  const [pdfConfirmMounted, setPdfConfirmMounted] = useState(false);
+  useEffect(() => {
+    if (settingsOpened) setSettingsMounted(true);
+  }, [settingsOpened]);
+  useEffect(() => {
+    if (helpOpened) setHelpMounted(true);
+  }, [helpOpened]);
+  useEffect(() => {
+    if (pdfConfirmOpened) setPdfConfirmMounted(true);
+  }, [pdfConfirmOpened]);
   /** 本文打鍵では再計算しない（設定適用直後にプレビューが消えるのを防ぐ） */
   const frontmatterKey = useMemo(
     () => frontmatterBlock(markdown),
@@ -2282,7 +2295,7 @@ export default function App() {
       </AppShell.Main>
 
       <Suspense fallback={null}>
-        {settingsOpened ? (
+        {settingsMounted ? (
           <SettingsModal
             opened={settingsOpened}
             markdown={markdown}
@@ -2290,7 +2303,7 @@ export default function App() {
             onApply={applySettings}
           />
         ) : null}
-        {helpOpened ? (
+        {helpMounted ? (
           <HelpModal
             opened={helpOpened}
             onClose={() => {
@@ -2300,7 +2313,7 @@ export default function App() {
             initialDocId={helpDocId}
           />
         ) : null}
-        {pdfConfirmOpened ? (
+        {pdfConfirmMounted ? (
           <PdfConfirmModal
             opened={pdfConfirmOpened}
             url={pdfUrl}

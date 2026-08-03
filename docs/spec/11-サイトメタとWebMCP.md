@@ -3,6 +3,13 @@
 版: **1.0.0**  
 対象: 開発・運用（画面ヘルプには出さない）
 
+| | |
+|--|--|
+| ソース | [https://github.com/GawaDev/ohyna](https://github.com/GawaDev/ohyna) |
+| 公開デモ | [https://ohyna.onrender.com/](https://ohyna.onrender.com/) |
+
+正規 URL 定数: `ohyna/project_meta.py`（`/health`・README と共通）。
+
 ---
 
 ## 1. 公開サイトメタ
@@ -17,15 +24,19 @@
 | `/sitemap.xml` | 公開 URL 一覧（検索エンジン向け） |
 | `/robots.txt` | クローラへの Allow／Disallow。POST API は Disallow |
 | `/.well-known/security.txt` | 脆弱性報告の連絡先（[RFC 9116](https://www.rfc-editor.org/rfc/rfc9116)） |
+| `/gui/` | GUI（HTML の OGP／canonical に絶対 URL。PWA マニフェスト・Service Worker） |
+| `/gui/og.png` | Open Graph／Twitter カード画像（1200×630） |
+| `/gui/manifest.webmanifest` | Web App Manifest（icons・screenshots 含む） |
 
 ### 環境変数
 
 | 変数 | 用途 |
 |------|------|
-| `OHYNA_PUBLIC_ORIGIN` | sitemap／llms の絶対 URL オリジン（例: `https://notes.example.com`） |
+| `OHYNA_PUBLIC_ORIGIN` | sitemap／llms／OGP の絶対 URL オリジン（デモ: `https://ohyna.onrender.com`） |
 | `OHYNA_SECURITY_CONTACT` | `security.txt` の `Contact:` を上書き（URL または `mailto:`） |
 
-未設定時、オリジンは `Host` と `X-Forwarded-Proto` から推定します（`127.0.0.1` / `localhost` は `http`、それ以外は `https`）。
+未設定時、オリジンは `Host` と `X-Forwarded-Proto` から推定します（`127.0.0.1` / `localhost` は `http`、それ以外は `https`）。  
+GUI の `index.html` 内 `__OHYNA_ORIGIN__` は配信時にこのオリジンへ置換します。
 
 ### 運用メモ
 
@@ -33,6 +44,7 @@
 - `robots.txt` はプレビュー／PDF／解析 API を Disallow する（クロール負荷と誤用防止）
 - `llms.txt` のリンク先はヘルプカタログと一致させる
 - `/health` の `webmcp` フィールドでページ URL・カタログ・注意書きを返す
+- OGP／PWA 用画像の再生成: `python brand/render_social.py`
 
 ---
 

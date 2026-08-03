@@ -4,6 +4,8 @@
 
 | | |
 |--|--|
+| ソース | [github.com/GawaDev/ohyna](https://github.com/GawaDev/ohyna) |
+| デモ | [ohyna.onrender.com](https://ohyna.onrender.com/) |
 | ライセンス | [MIT](./LICENSE) |
 | 第三者表記 | [THIRD_PARTY.md](./THIRD_PARTY.md) |
 | セキュリティ | [SECURITY.md](./SECURITY.md) |
@@ -65,7 +67,7 @@ python -m ohyna pdf doc.md -o out.pdf
 | `/robots.txt` | クローラ向け案内 |
 | `/.well-known/security.txt` | 脆弱性連絡先 |
 
-本番では `OHYNA_PUBLIC_ORIGIN`（例: `https://notes.example.com`）と `OHYNA_SECURITY_CONTACT` を設定してください。詳細は [docs/spec/11-サイトメタとWebMCP.md](docs/spec/11-サイトメタとWebMCP.md) です。
+本番では `OHYNA_PUBLIC_ORIGIN`（デモ例: `https://ohyna.onrender.com`）と `OHYNA_SECURITY_CONTACT` を設定してください。詳細は [docs/spec/11-サイトメタとWebMCP.md](docs/spec/11-サイトメタとWebMCP.md) です。
 
 ## GUI の再ビルド
 
@@ -82,7 +84,7 @@ docker build -t ohyna .
 docker run --rm -p 8787:8787 -e PORT=8787 ohyna
 ```
 
-[Render](https://render.com/) ではリポジトリの `render.yaml`（Blueprint）を使います。PDF 生成のため **Standard（2 GB）以上** を推奨します。デプロイ後、`OHYNA_PUBLIC_ORIGIN` に公開 URL（例: `https://ohyna.onrender.com`）を設定してください。
+[Render](https://render.com/) ではリポジトリの `render.yaml`（Blueprint）を使います。PDF 生成のため **Standard（2 GB）以上** を推奨します。公開デモは [https://ohyna.onrender.com/](https://ohyna.onrender.com/) です（`OHYNA_PUBLIC_ORIGIN` は Blueprint で同 URL を指定）。
 
 ## ライセンス
 

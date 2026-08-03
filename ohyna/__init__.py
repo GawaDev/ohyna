@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 """Ohyna（Open Hybrid Note App／おひな）— Markdown → PDF / Mermaid → SVG。
 
+ソース: https://github.com/GawaDev/ohyna  
+デモ: https://ohyna.onrender.com/
+
 参考:
 - https://docs.min87.com/ja/mermaid/intro/
 - https://docs.min87.com/ja/mermaid/config/theming
